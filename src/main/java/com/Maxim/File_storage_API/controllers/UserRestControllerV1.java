@@ -1,5 +1,8 @@
 package com.Maxim.File_storage_API.controllers;
 
+import com.Maxim.File_storage_API.entity.EventEntity;
+import com.Maxim.File_storage_API.entity.FileEntity;
+import com.Maxim.File_storage_API.entity.Status;
 import com.Maxim.File_storage_API.entity.UserEntity;
 import com.Maxim.File_storage_API.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +10,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -18,9 +24,25 @@ public class UserRestControllerV1 {
 
     @GetMapping("")
     public Mono<UserEntity> getUserById() {
-//        Mono<fg> s = userService.findUserById(23);
+        FileEntity file = new FileEntity();
+        file.setFilePath("/pizdec");
+        file.setCreateAt("bla");
+        file.setName("blo");
+        file.setUpdatedAt("fdf");
+        file.setStatus(Status.ACTIVE);
 
-        return userService.findUserById(23);
+        List<EventEntity> eventEntities = new ArrayList<>();
+
+        EventEntity event = new EventEntity();
+        event.setFile(file);
+        event.setStatus(Status.ACTIVE);
+        eventEntities.add(event);
+        UserEntity user = new UserEntity();
+        user.setName("ololo");
+        user.setEvents(eventEntities);
+        user.setStatus(Status.ACTIVE);
+
+        return userService.saveUser(user);
     }
 
 //    @GetMapping("")
