@@ -13,12 +13,15 @@ import reactor.core.publisher.Mono;
 public interface EventRepository extends ReactiveCrudRepository<EventEntity, Integer> {
 
     @Query("SELECT id,status FROM rest.events where user_id=:id;")
-//    TODO харкод таблицы
-    Flux<EventEntity> findAllByUserId(Integer id);
+    Flux<EventEntity> findAllIdRelatedEventsByUserId(Integer id);
 
     @Modifying
-    @Query("UPDATE events SET user_id = :user_id, file_id= :file_id WHERE id = :eventId;")
+    @Query("UPDATE events SET user_id = :user_id, file_id= :file_id, status = :status WHERE id = :eventId;")
 //    TODO харкод таблицы
-    Mono<EventEntity> updateEventByIdAllColumns(Integer eventId, Integer user_id, Integer file_id);
+    Mono<EventEntity> updateEventByIdAllColumns(Integer eventId, Integer user_id, Integer file_id, Status status);
+
+    @Query("UPDATE events SET  status = :status WHERE id = :eventId;")
+//    TODO харкод таблицы
+    Mono<EventEntity> updateEventStatus(Integer eventId,Status status);
 
 }

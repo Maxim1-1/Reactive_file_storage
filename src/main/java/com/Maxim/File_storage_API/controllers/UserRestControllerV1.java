@@ -4,6 +4,7 @@ import com.Maxim.File_storage_API.entity.EventEntity;
 import com.Maxim.File_storage_API.entity.FileEntity;
 import com.Maxim.File_storage_API.entity.Status;
 import com.Maxim.File_storage_API.entity.UserEntity;
+import com.Maxim.File_storage_API.service.FileService;
 import com.Maxim.File_storage_API.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +21,8 @@ public class UserRestControllerV1 {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private FileService fileService;
 
 
     @GetMapping("")
@@ -37,18 +40,18 @@ public class UserRestControllerV1 {
         EventEntity event = new EventEntity();
         event.setId(10);
         event.setFile(file);
-        event.setStatus(Status.DELETED);
+        event.setStatus(Status.ACTIVE);
         eventEntities.add(event);
 
         UserEntity user = new UserEntity();
 
-        user.setId(14);
+        user.setId(15);
 //        user.setName("1tttttttttessst");
 //        user.setStatus(Status.ACTIVE);
-        user.setEvents(eventEntities);
+//        user.setEvents(eventEntities);
 
 
-        return userService.updateUserById(user);
+        return userService.deleteU1serById(user);
     }
 
 
