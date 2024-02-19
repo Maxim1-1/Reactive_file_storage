@@ -25,25 +25,42 @@ public class UserRestControllerV1 {
     @GetMapping("")
     public Mono<UserEntity> getUserById() {
         FileEntity file = new FileEntity();
-        file.setFilePath("/pizdec");
-        file.setCreateAt("bla");
-        file.setName("blo");
-        file.setUpdatedAt("fdf");
-        file.setStatus(Status.ACTIVE);
+        file.setId(20);
+        file.setFilePath("1/pizdec");
+        file.setCreateAt("1bla");
+        file.setName("1blo");
+        file.setUpdatedAt("1fdf");
+        file.setStatus(Status.DELETED);
 
         List<EventEntity> eventEntities = new ArrayList<>();
-
+//
         EventEntity event = new EventEntity();
+        event.setId(10);
         event.setFile(file);
-        event.setStatus(Status.ACTIVE);
+        event.setStatus(Status.DELETED);
         eventEntities.add(event);
-        UserEntity user = new UserEntity();
-        user.setName("ololo");
-        user.setEvents(eventEntities);
-        user.setStatus(Status.ACTIVE);
 
-        return userService.saveUser(user);
+        UserEntity user = new UserEntity();
+
+        user.setId(14);
+//        user.setName("1tttttttttessst");
+//        user.setStatus(Status.ACTIVE);
+        user.setEvents(eventEntities);
+
+
+        return userService.updateUserById(user);
     }
+
+
+
+
+
+
+
+
+
+
+
 
 //    @GetMapping("")
 //    public Flux<UserDTO> getAllUsers() {

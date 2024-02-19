@@ -1,6 +1,5 @@
 package com.Maxim.File_storage_API.entity;
 
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Column;

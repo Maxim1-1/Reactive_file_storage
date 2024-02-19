@@ -2,6 +2,7 @@ package com.Maxim.File_storage_API.service;
 
 
 import com.Maxim.File_storage_API.entity.EventEntity;
+import com.Maxim.File_storage_API.entity.FileEntity;
 import com.Maxim.File_storage_API.entity.UserEntity;
 import com.Maxim.File_storage_API.repository.EventRepository;
 import com.Maxim.File_storage_API.repository.FileRepository;
@@ -9,6 +10,7 @@ import com.Maxim.File_storage_API.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -86,64 +88,109 @@ public class UserService {
         });
     }
 
-//    public Mono<UserEntity> saveUser(UserEntity user) {
-//
-//      return   userRepository.save(user).
-//                flatMap( userEntity -> {
-//                    for (EventEntity event: user.getEvents()) {
-//                        Mono<FileEntity> savedFile = fileRepository.save(event.getFile());
-//
-//                        savedFile.flatMap(fileEntity -> {
-//                            databaseClient.sql("INSERT INTO events (user_id, file_id) VALUES (:user_id, :file_id, ':status);")
-//                                    .bind("user_id",user.getId())
-//                                    .bind("file_id",fileEntity.getId())
-//                                    .bind("status",event.getStatus())
-//                                    .fetch()
-//                                    .rowsUpdated()
-//                                    .then(Mono.just(userEntity));
-//
-//
-//                                }
-//                        );
-//
-//                    }
-//                    return userEntity;
-//                }
-//
-//        );
-//    }
 
+    @Transactional
     public Mono<UserEntity> saveUser(UserEntity user) {
         return userRepository.save(user)
                 .flatMap(savedUser -> {
-                    return Flux.fromIterable(user.getEvents())
-                            .flatMap(event -> {
-                                return fileRepository.save(event.getFile())
-                                        .flatMap(fileEntity -> {
-                                            return databaseClient.sql("INSERT INTO events (user_id, file_id, status) VALUES (:user_id, :file_id, :status)")
+                    Flux<EventEntity> eventFlux = user.getEvents() != null ? Flux.fromIterable(user.getEvents()) : Flux.empty();
+                    return eventFlux.flatMap(event -> {
+                        FileEntity file = event.getFile();
+                        if (file == null) {
+                            event.setFile(null);
+                            return Mono.error(new RuntimeException("Файл не указан для события"));
+                        }
+                        return fileRepository.save(file)
+                                .flatMap(fileEntity -> {
+                                    return databaseClient.sql("INSERT INTO events (user_id, file_id, status) VALUES (:user_id, :file_id, :status)")
+                                            .bind("user_id", savedUser.getId())
+                                            .bind("file_id", fileEntity.getId())
+                                            .bind("status", event.getStatus())
+                                            .fetch()
+                                            .rowsUpdated()
+                                            .then(databaseClient.sql("SELECT MAX(id) FROM events WHERE user_id = :user_id")
                                                     .bind("user_id", savedUser.getId())
-                                                    .bind("file_id", fileEntity.getId())
-                                                    .bind("status", event.getStatus())
-                                                    .fetch()
-                                                    .rowsUpdated()
-                                                    .then(Mono.just(savedUser));
-                                        });
-                            })
-                            .then(Mono.just(savedUser));
+                                                    .map((row, rowMetadata) -> row.get(0, Integer.class))
+                                                    .one()
+                                                    .doOnNext(eventId -> event.setId(eventId))
+                                                    .then(Mono.just(savedUser)));
+                                });
+                    }).then(Mono.just(savedUser));
                 });
     }
 
 
-//    public Mono<UserEntity> updateUserById(UserEntity updatedUser) {
+
+
+
+    public Mono<UserEntity> updateUserById(UserEntity updatedUser) {
+        return userRepository.findById(updatedUser.getId())
+                .flatMap(existingUser -> {
+                    if (updatedUser.getName() != null) {
+                        existingUser.setName(updatedUser.getName());
+                    }
+                    if (updatedUser.getStatus() != null) {
+                        existingUser.setStatus(updatedUser.getStatus());
+                    }
+                    if (updatedUser.getEvents() != null) {
+                        existingUser.setEvents(updatedUser.getEvents());
+                    }
+
+                    for (EventEntity event : updatedUser.getEvents()) {
+
+                        if (event.getFile() != null) {
+
+
+                            eventRepository.updateEventByIdAllColumns(event.getId(), updatedUser.getId(), event.getFile().getId());
+                        } else {
+                            eventRepository.updateEventByIdAllColumns(event.getId(), updatedUser.getId(), null);
+                        }
+                    }
+
+                    return userRepository.save(existingUser);
+                });
+    }
+
+//    work
+//    public Mono<UserEntity> up1dateUserById(UserEntity updatedUser) {
 //        return userRepository.findById(updatedUser.getId())
 //                .flatMap(existingUser -> {
-////                    TODO дописать сравнение аналогичных параметров
-//                    if (existingUser.getName().equalsIgnoreCase(updatedUser.getName())){}
-//                    existingUser.setName(updatedUser.getName());
-////                    TODo заменить save ниже на saveUser
-//                    return saveUser(existingUser);
+//                    if (updatedUser.getName() != null) {
+//                        existingUser.setName(updatedUser.getName());
+//                    }
+//                    if (updatedUser.getStatus() != null) {
+//                        existingUser.setStatus(updatedUser.getStatus());
+//                    }
+//                    if (updatedUser.getEvents() != null) {
+//                        return Flux.fromIterable(updatedUser.getEvents())
+//                                .flatMap(event -> {
+//                                    if (event.getFile() != null) {
+//                                        return eventRepository.updateEventByIdAllColumns(event.getId(), updatedUser.getId(), event.getFile().getId()).then();
+//                                    } else {
+//                                        return eventRepository.updateEventByIdAllColumns(event.getId(), updatedUser.getId(), null).then();
+//                                    }
+//                                })
+//                                .collectList()
+//                                .flatMap(events -> {
+//                                    existingUser.setEvents(updatedUser.getEvents());
+//                                    return userRepository.save(existingUser);
+//                                });
+//                    } else {
+//                        return userRepository.save(existingUser);
+//                    }
 //                });
 //    }
+
+
+
+
+
+
+
+
+
+
+
 }
 
 // TODO уточнить надо ли при удалении юзера удалять связанные с ним Event, File, наверное так и сделаю ток не удалять а статус менять

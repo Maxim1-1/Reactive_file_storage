@@ -39,4 +39,6 @@ public interface UserRepository extends ReactiveCrudRepository<UserEntity, Integ
 //            "where user.id = :id;")
 //    Flux<fg> findUserByIdFlux(Integer id);
 
+//    Mono<UserEntity> updateUserUsername(Long userId, String newUsername);
+
 }
