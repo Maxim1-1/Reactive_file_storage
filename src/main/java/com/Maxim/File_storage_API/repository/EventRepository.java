@@ -24,4 +24,7 @@ public interface EventRepository extends ReactiveCrudRepository<EventEntity, Int
 //    TODO харкод таблицы
     Mono<EventEntity> updateEventStatus(Integer eventId,Status status);
 
+    @Query("insert into events (user_id, file_id,status) values(:userId, :fileId, :status) ")
+    Mono<EventEntity> insertEvent(Integer userId,Integer fileId,Status status);
+
 }

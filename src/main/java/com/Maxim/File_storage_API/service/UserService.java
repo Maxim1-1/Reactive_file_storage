@@ -104,7 +104,7 @@ public class UserService {
                         FileEntity file = event.getFile();
                         if (file == null) {
                             event.setFile(null);
-                            return Mono.error(new RuntimeException("Файл не указан для события"));
+                            return Mono.error(new RuntimeException("Файл для события не указан"));
                         }
                         return fileRepository.save(file)
                                 .flatMap(fileEntity -> {
@@ -155,60 +155,18 @@ public class UserService {
                 });
     }
 
-//    public Mono<UserEntity> deleteUserById(UserEntity user) {
-//         return userRepository.findById(user.getId())
-//                .flatMap(userEntity -> {
-//                    userEntity.setStatus(Status.DELETED);
-//
-//                    return eventRepository.findAllByUserId(user.getId())
-//                            .flatMapMany(Flux::fromIterable)
-//                            .flatMap(event -> {
-//                                Mono<Void> fileUpdate = Mono.empty();
-//                                if (event.getFile() != null) {
-//                                    fileUpdate = fileRepository.updateFileStatus(event.getFile().getId(), Status.DELETED);
-//                                }
-//                                Mono<Void> eventUpdate = eventRepository.updateEventStatus(event.getId(), Status.DELETED);
-//
-//                                return Mono.when(fileUpdate, eventUpdate);
-//                            })
-//                            .thenMany(userRepository.save(userEntity));
-//                });
-//
-//
-//    }
-@Transactional
-    public Mono<UserEntity> deleteUserById(UserEntity user) {
-
-        return userRepository.findById(user.getId())
-                .flatMap(userEntity -> {
-                    userEntity.setStatus(Status.DELETED);
-
-                    return eventRepository.findAllIdRelatedEventsByUserId(user.getId())
-                            .collectList()
-                            .flatMap(events -> {
-                                for (EventEntity event : events) {
-
-                                    if (event.getFile() != null) {
-                                        fileRepository.updateFileStatus(event.getFile().getId(),Status.DELETED);
-                                    }
-                                    eventRepository.updateEventStatus(event.getId(), Status.DELETED).subscribe();
-                                }
-                                return userRepository.save(userEntity);
-                            });
-                });
-    }
 
 
 
     @Transactional
-    public Mono<UserEntity> deleteU1serById(UserEntity user) {
+    public Mono<UserEntity> deleteUserById(Integer id) {
 
-        return userRepository.findById(user.getId())
+        return userRepository.findById(id)
                 .flatMap(userEntity -> {
                     userEntity.setStatus(Status.DELETED);
 
-                    return eventRepository.findAllIdRelatedEventsByUserId(user.getId())
-                            .flatMap(event -> eventService.getEventByIdWithFile(event.getId())
+                    return eventRepository.findAllIdRelatedEventsByUserId(id)
+                            .flatMap(event -> eventService.getEventById(event.getId())
                                     .flatMap(eventWithFile -> {
                                         if (eventWithFile.getFile() != null) {
                                             return fileRepository.updateFileStatus(eventWithFile.getFile().getId(), Status.DELETED)
@@ -226,28 +184,6 @@ public class UserService {
                 });
     }
 
-
-//    public Mono<UserEntity> dele3teUserById(UserEntity user) {
-//        return userRepository.findById(user.getId())
-//                .flatMap(userEntity -> {
-//                    userEntity.setStatus(Status.DELETED);
-//
-//                    return eventRepository.findAllByUserId(user.getId())
-//                            .collectList()
-//                            .flatMap(events -> Flux.fromIterable(events)
-//                                    .flatMap(event -> {
-//                                        if (event.getFile() != null) {
-//                                            return fileRepository.updateFileStatus(event.getFile().getId(), Status.DELETED);
-//                                        } else {
-//                                            return Mono.empty();
-//                                        }
-//                                    })
-//                                    .thenMany(Flux.fromIterable(events)
-//                                            .flatMap(event -> eventRepository.updateEventStatus(event.getId(), Status.DELETED))
-//                                    )
-//                                    .then(userRepository.save(userEntity)));
-//                });
-//    }
 
 }
 

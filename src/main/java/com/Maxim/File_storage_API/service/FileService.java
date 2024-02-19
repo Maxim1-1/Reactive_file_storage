@@ -30,12 +30,9 @@ public class FileService {
         return fileRepository.findAll();
     }
 
-//    public FileEntity updateFileById(File file) {
-//
-////TODO make it through, userRepository.existsById(id)
-//// +  сделать сравнение полей юзера из бд, и полей из json
-//        return null;
-//    }
+    public Mono<FileEntity> updateFileById(FileEntity file) {
+        return fileRepository.save(file);
+    }
 
     public Mono<FileEntity> deleteFileById(Integer id) {
         return fileRepository.findById(id)
@@ -44,7 +41,5 @@ public class FileService {
                     return fileRepository.save(fileEntity);
                 });
     }
-//public Mono<FileEntity> deleteFileById(Integer id) {
-//    return fileRepository.updateFileStatus(id,Status.DELETED);
-//}
+
 }
