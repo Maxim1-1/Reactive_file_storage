@@ -21,7 +21,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 
 
 @Configuration
-@EnableWebSecurity
+//@EnableWebSecurity
 @EnableReactiveMethodSecurity
 public class WebSecurityConfig  {
 
