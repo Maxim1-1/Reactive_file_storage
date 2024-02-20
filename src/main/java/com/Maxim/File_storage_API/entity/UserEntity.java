@@ -16,11 +16,30 @@ public class UserEntity {
     private Integer id;
 
     private String name;
+    private String password;
+
+    private Role role;
 
     @Transient
     private  List<EventEntity> events;
 
     private Status status;
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
     public Status getStatus() {
         return status;

@@ -18,7 +18,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 @Service
-public class UserService {
+public class UserService  {
 
     @Autowired
     private UserRepository userRepository;
@@ -34,6 +34,9 @@ public class UserService {
 
     @Autowired
     private DatabaseClient databaseClient;
+
+
+
 
     public Flux<UserEntity> findAllUsers() {
         return userRepository.findAll()
@@ -125,7 +128,7 @@ public class UserService {
                 });
     }
 
-
+    @Transactional
     public Mono<UserEntity> updateUserById(UserEntity updatedUser) {
         return userRepository.findById(updatedUser.getId())
                 .flatMap(existingUser -> {
@@ -184,6 +187,10 @@ public class UserService {
                 });
     }
 
+
+    public Mono<UserEntity> getUserByUsername(String username) {
+        return userRepository.findByName(username);
+    }
 
 }
 

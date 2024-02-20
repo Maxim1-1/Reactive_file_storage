@@ -6,6 +6,7 @@ import com.Maxim.File_storage_API.entity.Status;
 import com.Maxim.File_storage_API.repository.FileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -17,7 +18,7 @@ public class FileService {
 
     @Autowired
     private FileRepository fileRepository;
-
+    @Transactional
     public Mono<FileEntity> saveFile (FileEntity file) {
         return fileRepository.save(file);
     }
@@ -29,11 +30,11 @@ public class FileService {
     public Flux<FileEntity> getAllFiles() {
         return fileRepository.findAll();
     }
-
+    @Transactional
     public Mono<FileEntity> updateFileById(FileEntity file) {
         return fileRepository.save(file);
     }
-
+    @Transactional
     public Mono<FileEntity> deleteFileById(Integer id) {
         return fileRepository.findById(id)
                 .flatMap(fileEntity -> {

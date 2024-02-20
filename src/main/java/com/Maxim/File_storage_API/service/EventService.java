@@ -7,6 +7,7 @@ import com.Maxim.File_storage_API.repository.EventRepository;
 import com.Maxim.File_storage_API.repository.FileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import org.springframework.r2dbc.core.DatabaseClient;
@@ -40,6 +41,7 @@ public class EventService {
         return eventRepository.findAll().flatMap(event -> getEventById(event.getId()));
     }
 
+    @Transactional
     public Mono<EventEntity> saveEvents(EventEntity event) {
         return eventRepository.insertEvent(event.getUser().getId(), event.getFile().getId(), event.getStatus())
                 .flatMap(savedEvent -> {
@@ -52,10 +54,12 @@ public class EventService {
                 });
     }
 
+    @Transactional
     public Mono<EventEntity> updateEventById(EventEntity event) {
         return eventRepository.updateEventByIdAllColumns(event.getId(),event.getUser().getId(),event.getFile().getId(),event.getStatus());
     }
 
+    @Transactional
     public Mono<EventEntity> deleteEventById(Integer id) {
         return eventRepository.updateEventStatus(id, Status.DELETED);
 
