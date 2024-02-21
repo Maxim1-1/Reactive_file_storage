@@ -1,6 +1,7 @@
 package com.Maxim.File_storage_API.security;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -13,12 +14,12 @@ import java.util.Base64;
 @Component
 public class PBFDK2Encoder implements PasswordEncoder {
 
-    @Value("${jwt.password.encoder.secret}")
-    private String secret;
-    @Value("${jwt.password.encoder.iteration}")
-    private Integer iteration;
-    @Value("${jwt.password.encoder.keylength}")
-    private Integer keyLength;
+//    @Value("${jwt.secret_encoder}")
+    private String secret="FZK2DZ82odqS13e8aENggaMbb_fAkl-nJL4AEVBX43g";
+//    @Value("${jwt.iteration_encoder}")
+    private Integer iteration=64;
+//    @Value("${jwt.keylength_encoder}")
+    private Integer keyLength=256;
 
     private static final String SECRET_KEY_INSTANCE = "PBKDF2WithHmacSHA512";
 

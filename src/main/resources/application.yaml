@@ -3,27 +3,15 @@ server:
 
 spring:
   r2dbc:
-    url: r2dbc:mysql://localhost:3306/rest
+    url: r2dbc:mysql://localhost:3306/test
     username: root
     password: root
-#  main:
-#    allow-bean-definition-overriding=true:
-
-#  flyway:
-#    url: jdbc:postgresql://localhost:5432/
-#    locations: classpath:db/migration
-#    user: ${spring.r2dbc.username}
-#    password: ${spring.r2dbc.password}
 
 jwt:
+  secret_encoder: FZK2DZ82odqS13e8aENggaMbb_fAkl-nJL4AEVBX43g
+  iteration_encoder: 64
+  keylength_encoder: 256
+  secret: b5f59337a612a2a7dc07328f3e7d1a04722967c7f06df20a499a7d3f91ff2a7e
+  expiration: 3600
   issuer: maxim
   lifetime: 10m
-  password:
-    encoder:
-      secret:
-      iteration: 64
-      keylength: 256
-
-  secret:
-  expiration: 3600
-

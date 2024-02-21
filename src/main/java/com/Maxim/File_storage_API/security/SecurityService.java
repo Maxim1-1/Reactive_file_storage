@@ -20,15 +20,15 @@ public class SecurityService {
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
 
-    @Value("${jwt.secret}")
-    private String secret;
-    @Value("${jwt.expiration}")
-    private Integer expirationInSeconds;
-    @Value("${jwt.issuer}")
-    private String issuer;
+//    @Value("${jwt.secret}")
+    private String secret="b5f59337a612a2a7dc07328f3e7d1a04722967c7f06df20a499a7d3f91ff2a7e";
+//    @Value("${jwt.expiration}")
+    private Long expirationInSeconds=3600L;
+//    @Value("${jwt.issuer}")
+    private String issuer="maxim";
 
-    @Value("${jwt.lifetime}")
-    private Duration jwtLifetime;
+//    @Value("${jwt.lifetime}")
+    private Duration jwtLifetime=Duration.ofMinutes(60);
 
 
 
@@ -46,11 +46,11 @@ public class SecurityService {
     }
 
     private TokenDetails generateToken(Map<String, Object> claims, String subject) {
-        Date issuedDate = new Date();
-        Date expiredDate = new Date(issuedDate.getTime() + jwtLifetime.toMillis());
-        return generateToken(expiredDate, claims, subject);
-    }
+        Long expirationTimeInMillis = expirationInSeconds * 1000L;
+        Date expirationDate = new Date(new Date().getTime() + expirationTimeInMillis);
 
+        return generateToken(expirationDate, claims, subject);
+    }
 
 
     private TokenDetails generateToken(Date expirationDate, Map<String, Object> claims, String subject) {

@@ -17,13 +17,22 @@ public class UserEntity {
 
     private String name;
     private String password;
-
     private Role role;
-
+    private Status status;
     @Transient
     private  List<EventEntity> events;
+    public UserEntity() {
 
-    private Status status;
+    }
+
+    public UserEntity(Integer id, String name, String password, Role role, Status status, List<EventEntity> events) {
+        this.id = id;
+        this.name = name;
+        this.password = password;
+        this.role = role;
+        this.status = status;
+        this.events = events;
+    }
 
     public Role getRole() {
         return role;

@@ -1,15 +1,14 @@
 package com.Maxim.File_storage_API.service;
 
 
-import com.Maxim.File_storage_API.entity.EventEntity;
-import com.Maxim.File_storage_API.entity.FileEntity;
-import com.Maxim.File_storage_API.entity.Status;
-import com.Maxim.File_storage_API.entity.UserEntity;
+import com.Maxim.File_storage_API.entity.*;
 import com.Maxim.File_storage_API.repository.EventRepository;
 import com.Maxim.File_storage_API.repository.FileRepository;
 import com.Maxim.File_storage_API.repository.UserRepository;
+import com.Maxim.File_storage_API.security.PBFDK2Encoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.r2dbc.core.DatabaseClient;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
@@ -34,6 +33,22 @@ public class UserService  {
 
     @Autowired
     private DatabaseClient databaseClient;
+
+    private final PasswordEncoder passwordEncoder = new PBFDK2Encoder();
+
+    public Mono<UserEntity> registerUser(UserEntity user) {
+        UserEntity createUser = new UserEntity();
+
+        createUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        createUser.setRole(user.getRole());
+        createUser.setName(user.getName());
+        createUser.setStatus(Status.ACTIVE);
+
+        return userRepository.save(createUser);
+
+
+    }
+
 
 
 

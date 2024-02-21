@@ -29,14 +29,17 @@ dependencies {
 	testImplementation 'io.projectreactor:reactor-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 
-
-//	implementation 'jakarta.platform:jakarta.jakartaee-api:9.1.0'
-
 	implementation "io.jsonwebtoken:jjwt:$jsonWebTokenVersion"
 
-//	implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
-//	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
-//	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
+
+
+
+	annotationProcessor "org.mapstruct:mapstruct-processor:$mapStructVersion"
+	implementation "org.mapstruct:mapstruct:$mapStructVersion"
+
+
+	implementation "jakarta.xml.bind:jakarta.xml.bind-api:$jakartaXmlBind"
+	implementation "org.glassfish.jaxb:jaxb-runtime:$jakartaXmlBind"
 
 	implementation("software.amazon.awssdk:s3:$awsS3Version")
 	implementation "io.asyncer:r2dbc-mysql:$r2dbcMySQLVersion"

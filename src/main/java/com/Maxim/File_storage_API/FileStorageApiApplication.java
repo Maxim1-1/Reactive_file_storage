@@ -1,6 +1,8 @@
 package com.Maxim.File_storage_API;
 
 
+import com.Maxim.File_storage_API.mapper.UserMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 

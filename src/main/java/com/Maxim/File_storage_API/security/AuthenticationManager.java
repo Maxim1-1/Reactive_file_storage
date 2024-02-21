@@ -20,6 +20,7 @@ public class AuthenticationManager implements ReactiveAuthenticationManager {
     public Mono<Authentication> authenticate(Authentication authentication) {
         CustomPrincipal principal = (CustomPrincipal) authentication.getPrincipal();
         return userService.findUserById(principal.getId())
+//                TODO проверка статуса active, deleted
 //                .filter(UserEntity::isEnabled)
                 .switchIfEmpty(Mono.error(new RuntimeException("User disabled")))
                 .map(user -> authentication);

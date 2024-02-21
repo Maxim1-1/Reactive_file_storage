@@ -1,16 +1,16 @@
 package com.Maxim.File_storage_API.dto;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
-
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class EventDTO {
 
     private Integer id;
-
     @JsonBackReference
     private UserDTO userDTO;
-    private FileDTO fileDTO;
-
+    private FileDTO file;
     private String status;
     public Integer getId() {
         return id;
@@ -24,20 +24,20 @@ public class EventDTO {
 
     public void setId(Integer id) {this.id = id;}
 
-    public UserDTO getUserDTO() {
-        return userDTO;
+//    public UserDTO getUserDTO() {
+//        return userDTO;
+//    }
+//
+//    public void setUserDTO(UserDTO userDTO) {
+//        this.userDTO = userDTO;
+//    }
+
+    public FileDTO getFile() {
+        return file;
     }
 
-    public void setUserDTO(UserDTO userDTO) {
-        this.userDTO = userDTO;
-    }
-
-    public FileDTO getFileDTO() {
-        return fileDTO;
-    }
-
-    public void setFileDTO(FileDTO fileDTO) {
-        this.fileDTO = fileDTO;
+    public void setFile(FileDTO file) {
+        this.file = file;
     }
 
 }
