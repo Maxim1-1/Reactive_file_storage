@@ -49,7 +49,7 @@ public class WebSecurityConfig  {
             return     http.csrf(csrf -> csrf.disable())
 //                    .securityMatcher(ServerWebExchangeMatchers.pathMatchers("/api/v1/**"))
                     .authorizeExchange(authorize -> authorize
-                        .pathMatchers("/api/v1/auth/register","/api/v1/auth/login","/api/v1/auth/register1")
+                        .pathMatchers("/api/v1/auth/register","/api/v1/auth/login","/api/v1/files")
                             .permitAll()
                                     .pathMatchers("/api/v1/users").hasAnyAuthority("ADMIN")
                         )

@@ -7,6 +7,7 @@ spring:
     username: root
     password: root
 
+
 jwt:
   secret_encoder: FZK2DZ82odqS13e8aENggaMbb_fAkl-nJL4AEVBX43g
   iteration_encoder: 64

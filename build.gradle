@@ -31,9 +31,6 @@ dependencies {
 
 	implementation "io.jsonwebtoken:jjwt:$jsonWebTokenVersion"
 
-
-
-
 	annotationProcessor "org.mapstruct:mapstruct-processor:$mapStructVersion"
 	implementation "org.mapstruct:mapstruct:$mapStructVersion"
 
