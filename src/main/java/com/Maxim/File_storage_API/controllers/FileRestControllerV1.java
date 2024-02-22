@@ -1,7 +1,6 @@
 package com.Maxim.File_storage_API.controllers;
 
 import com.Maxim.File_storage_API.dto.FileDTO;
-import com.Maxim.File_storage_API.entity.EventEntity;
 import com.Maxim.File_storage_API.entity.FileEntity;
 import com.Maxim.File_storage_API.entity.Status;
 import com.Maxim.File_storage_API.entity.UserEntity;
@@ -10,22 +9,17 @@ import com.Maxim.File_storage_API.repository.file_storage.S3RepositoryImpl;
 import com.Maxim.File_storage_API.security.CustomPrincipal;
 import com.Maxim.File_storage_API.service.FileService;
 import com.Maxim.File_storage_API.service.FileUserService;
-import com.Maxim.File_storage_API.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
-import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import java.util.stream.Stream;
-import java.io.IOException;
+
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/files")
@@ -44,22 +38,24 @@ public class FileRestControllerV1 {
 
     private final FileUserService fileUserService;
 
-    @GetMapping("/{id}")
-    public Mono<FileDTO> getFileById(@PathVariable Integer id) {
-        return fileService.getFileById(id).map(fileMapper::map);
+
+    @GetMapping("/{fileId}")
+    public Mono<FileDTO> getFileById(@PathVariable Integer fileId, Authentication authentication) {
+        CustomPrincipal userDetails = (CustomPrincipal) authentication.getPrincipal();
+        Integer userId = userDetails.getId();
+        return fileUserService.getFileByIDForRole(authentication.getAuthorities(),userId,fileId).map(fileMapper::map);
     }
 
     @GetMapping("")
     public Flux<FileDTO> getAllFiles(Authentication authentication) {
         CustomPrincipal userDetails = (CustomPrincipal) authentication.getPrincipal();
         Integer userId = userDetails.getId();
-        return fileUserService.getFilesForRole(authentication.getAuthorities(),userId).map(fileMapper::map);
+        return fileUserService.getAllFilesForRole(authentication.getAuthorities(),userId).map(fileMapper::map);
     }
 
 
     @RequestMapping(value = "", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Mono<FileEntity> saveFile(@RequestPart("file") Mono<FilePart> file) {
-
         String bucket = "files-strorage-repository";
         S3RepositoryImpl s3 = new  S3RepositoryImpl();
 
@@ -82,39 +78,15 @@ public class FileRestControllerV1 {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     @PutMapping("/{id}")
-    public Mono<FileEntity> updateFileById(@PathVariable Integer id,@RequestBody UserEntity user) {
-        FileEntity file1 = new FileEntity();
-        file1.setId(id);
-        file1.setUpdatedAt("");
-        file1.setName("fgggggggggggggg");
-
-        return fileService.updateFileById(file1);
+    public Mono<FileDTO> updateFileById(@PathVariable Integer id,@RequestBody FileDTO fileDTO) {
+        FileEntity file = fileMapper.map(fileDTO);
+        return fileService.updateFileById(file).map(fileMapper::map);
     }
 
     @DeleteMapping("/{id}")
-    public Mono<FileEntity> deleteFileById(@PathVariable Integer id) {
-        return fileService.deleteFileById(id);
+    public Mono<FileDTO> deleteFileById(@PathVariable Integer id) {
+        return fileService.deleteFileById(id).map(fileMapper::map);
     }
 
 }

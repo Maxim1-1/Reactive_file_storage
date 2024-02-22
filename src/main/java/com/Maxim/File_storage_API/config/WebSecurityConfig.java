@@ -23,6 +23,7 @@ import org.springframework.security.web.server.authentication.AuthenticationWebF
 import org.springframework.security.web.server.util.matcher.NegatedServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.http.HttpMethod;
 
 @Configuration
 @EnableReactiveMethodSecurity
@@ -40,12 +41,16 @@ public class WebSecurityConfig  {
 
 
             return     http.csrf(csrf -> csrf.disable())
-//                    .securityMatcher(ServerWebExchangeMatchers.pathMatchers("/api/v1/**")).authorizeExchange(s->s.pathMatchers("/api/v1/**").hasRole("ADMIN"))
 
                     .authorizeExchange(authorize -> authorize
-                        .pathMatchers("/api/v1/auth/register","/api/v1/auth/login","/api/v1/files")
-                            .permitAll().anyExchange().authenticated()
-//                                    .pathMatchers("/api/v1/users").hasAnyAuthority("MODERATOR")
+                                    .pathMatchers(HttpMethod.PUT, "/api/v1/files/*").hasAnyAuthority("ADMIN", "MODERATOR")
+                                    .pathMatchers(HttpMethod.DELETE, "/api/v1/files/*").hasAnyAuthority("ADMIN", "MODERATOR")
+                                    .pathMatchers(HttpMethod.GET, "/api/v1/users/*").hasAnyAuthority( "MODERATOR")
+                                    .pathMatchers( "/api/v1/users/*").hasAnyAuthority( "ADMIN")
+                                    .pathMatchers("/api/v1/events/*").hasAnyAuthority( "ADMIN", "MODERATOR")
+                        .pathMatchers("/api/v1/auth/register","/api/v1/auth/login")
+                            .permitAll()
+                            .anyExchange().authenticated()
                         )
                     .addFilterAfter(bearerAuthenticationFilter(authenticationManager), SecurityWebFiltersOrder.AUTHENTICATION)
                     .build();

@@ -27,4 +27,6 @@ public interface EventRepository extends ReactiveCrudRepository<EventEntity, Int
     @Query("insert into events (user_id, file_id,status) values(:userId, :fileId, :status) ")
     Mono<EventEntity> insertEvent(Integer userId,Integer fileId,Status status);
 
+    @Query("SELECT * FROM rest.events where user_id=:userId and file_id=:fileId;")
+    Mono<EventEntity> findFileByUserId(Integer userId,Integer fileId);
 }

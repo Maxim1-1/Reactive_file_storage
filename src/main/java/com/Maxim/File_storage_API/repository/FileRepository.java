@@ -19,4 +19,6 @@ public interface FileRepository extends ReactiveCrudRepository<FileEntity, Integ
     @Query("UPDATE files SET  status = :status WHERE id = :fileId;")
 //    TODO харкод таблицы
     Mono<FileEntity> updateFileStatus(Integer fileId, Status status);
+
+
 }

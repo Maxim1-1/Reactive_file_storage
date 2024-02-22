@@ -3,7 +3,7 @@ server:
 
 spring:
   r2dbc:
-    url: r2dbc:mysql://localhost:3306/test
+    url: r2dbc:mysql://localhost:3306/rest
     username: root
     password: root
 

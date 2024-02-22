@@ -9,7 +9,6 @@ public class FileEntity {
 
     @Id
     private Integer id;
-
     private String name;
     private String filePath;
 
