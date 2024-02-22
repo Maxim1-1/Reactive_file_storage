@@ -18,6 +18,11 @@ public class FileService {
 
     @Autowired
     private FileRepository fileRepository;
+
+      public Flux<FileEntity> getFilesByUserId(Integer userId) {
+
+        return null;
+    }
     @Transactional
     public Mono<FileEntity> saveFile (FileEntity file) {
         return fileRepository.save(file);

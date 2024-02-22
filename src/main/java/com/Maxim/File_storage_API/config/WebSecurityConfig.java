@@ -34,43 +34,23 @@ public class WebSecurityConfig  {
 
     private final String[] publicRoutes = {"/api/v1/auth/register", "/api/v1/auth/login"};
 
-//    @Bean
-//    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) throws Exception {
-//      return  http.csrf(csrf -> csrf.disable())
-//              .securityMatcher(ServerWebExchangeMatchers.pathMatchers("/api/v1/users"))
-//
-//              .build();
-//    }
 
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
 
 
             return     http.csrf(csrf -> csrf.disable())
-//                    .securityMatcher(ServerWebExchangeMatchers.pathMatchers("/api/v1/**"))
+//                    .securityMatcher(ServerWebExchangeMatchers.pathMatchers("/api/v1/**")).authorizeExchange(s->s.pathMatchers("/api/v1/**").hasRole("ADMIN"))
+
                     .authorizeExchange(authorize -> authorize
                         .pathMatchers("/api/v1/auth/register","/api/v1/auth/login","/api/v1/files")
-                            .permitAll()
-                                    .pathMatchers("/api/v1/users").hasAnyAuthority("ADMIN")
+                            .permitAll().anyExchange().authenticated()
+//                                    .pathMatchers("/api/v1/users").hasAnyAuthority("MODERATOR")
                         )
                     .addFilterAfter(bearerAuthenticationFilter(authenticationManager), SecurityWebFiltersOrder.AUTHENTICATION)
                     .build();
 
     }
-
-//    @Bean
-//    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
-//
-//
-//        return     http.csrf(csrf -> csrf.disable())
-//                    .securityMatcher(ServerWebExchangeMatchers.pathMatchers("/api/v1/**")).authorizeExchange(s -> s.)
-//
-//                .build();
-//
-//    }
-
-
-
 
 
     private AuthenticationWebFilter bearerAuthenticationFilter(ReactiveAuthenticationManager authenticationManager) {
