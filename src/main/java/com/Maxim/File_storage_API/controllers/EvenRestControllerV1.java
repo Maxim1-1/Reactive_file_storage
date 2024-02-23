@@ -8,10 +8,12 @@ import com.Maxim.File_storage_API.entity.UserEntity;
 import com.Maxim.File_storage_API.mapper.EventMapper;
 import com.Maxim.File_storage_API.mapper.FileMapper;
 import com.Maxim.File_storage_API.repository.EventRepository;
+import com.Maxim.File_storage_API.security.CustomPrincipal;
 import com.Maxim.File_storage_API.service.EventService;
 import com.Maxim.File_storage_API.service.FileService;
 import com.Maxim.File_storage_API.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -32,8 +34,6 @@ public class EvenRestControllerV1 {
     private EventMapper eventMapper;
 
 
-
-
     @GetMapping("/{id}")
     public Mono<EventEntity> getEventById(@PathVariable Integer id) {
         return eventService.getEventById(id);
@@ -45,13 +45,21 @@ public class EvenRestControllerV1 {
     }
 
     @PostMapping("")
-    public Mono<EventDTO> saveEvents (@RequestBody EventDTO event) {
-          EventEntity eventEntity = eventMapper.map(event);
-          return eventService.saveEvent(eventEntity).map(eventMapper::map);
+    public Mono<EventDTO> saveEvents(@RequestBody EventDTO event, Authentication authentication) {
+        CustomPrincipal userDetails = (CustomPrincipal) authentication.getPrincipal();
+        Integer userId = userDetails.getId();
+        EventEntity eventEntity = eventMapper.map(event);
+        return eventService.saveEvent(eventEntity,userId).map(eventMapper::map);
+    }
+
+    @PostMapping("t")
+    public Mono<EventDTO> sagveEvents(@RequestBody EventDTO event) {
+        EventEntity eventEntity = eventMapper.map(event);
+        return eventService.save(eventEntity).map(eventMapper::map);
     }
 
     @PutMapping("/{id}")
-    public Mono<EventDTO> updateEventById(@PathVariable Integer id,@RequestBody EventDTO event) {
+    public Mono<EventDTO> updateEventById(@PathVariable Integer id, @RequestBody EventDTO event) {
         event.setId(id);
         EventEntity eventEntity = eventMapper.map(event);
         return eventService.updateEventById(eventEntity).map(eventMapper::map);

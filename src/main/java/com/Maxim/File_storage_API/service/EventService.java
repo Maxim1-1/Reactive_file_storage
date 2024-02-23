@@ -64,13 +64,14 @@ public class EventService {
 //                .bind("status",event.getStatus())
 //                .fetch();}
 
-    public Mono<EventEntity> saveEvent(EventEntity event) {
-        return databaseClient.sql("INSERT INTO events (user_id, file_id, status) VALUES (:userId, :fileId, :status) RETURNING id")
-                .bind("userId", event.getUser().getId())
+    public Mono<EventEntity> saveEvent(EventEntity event, Integer userId) {
+        return databaseClient.sql("INSERT INTO events (user_id, file_id, status) VALUES (:userId, :fileId, :status)")
+                .bind("userId", userId)
                 .bind("fileId", event.getFile().getId())
                 .bind("status", event.getStatus())
-                .map((row, rowMetadata) -> row.get("id", Integer.class))
-                .one()
+                .fetch()
+                .rowsUpdated()
+                .flatMap(rowsUpdated -> databaseClient.sql("SELECT last_insert_id() as id").map((row, rowMetadata) -> row.get("id", Integer.class)).one())
                 .doOnNext(eventId -> event.setId(eventId))
                 .thenReturn(event);
     }

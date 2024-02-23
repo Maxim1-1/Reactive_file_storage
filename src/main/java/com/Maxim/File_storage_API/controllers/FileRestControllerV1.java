@@ -55,23 +55,10 @@ public class FileRestControllerV1 {
 
 
     @RequestMapping(value = "", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public Mono<FileDTO> saveFile(@RequestPart("file") Mono<FilePart> file) {
-        String bucket = "files-strorage-repository";
-        S3RepositoryImpl s3 = new  S3RepositoryImpl();
-
-        return file.flatMap(f -> {
-            return s3.uploadFile(Mono.just(f), bucket, f.filename())
-                    .map(filePath -> {
-                        FileEntity fileEntity = new FileEntity();
-                        fileEntity.setFilePath(filePath);
-                        fileEntity.setName(f.filename());
-                        fileEntity.setCreateAt(String.valueOf(LocalDate.now()));
-                        fileEntity.setUpdatedAt(String.valueOf(LocalDate.now()));
-                        fileEntity.setStatus(Status.ACTIVE);
-                        return fileEntity;
-                    })
-                    .flatMap(fileService::saveFile).map(fileMapper::map);
-        });
+    public Mono<FileDTO> saveFile(@RequestPart("file") Mono<FilePart> file, Authentication authentication) {
+        CustomPrincipal userDetails = (CustomPrincipal) authentication.getPrincipal();
+        Integer userId = userDetails.getId();
+        return fileUserService.saveFile(file,userId).map(fileMapper::map);
     }
 
 
