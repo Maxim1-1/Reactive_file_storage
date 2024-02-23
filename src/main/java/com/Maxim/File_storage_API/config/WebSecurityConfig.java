@@ -39,9 +39,7 @@ public class WebSecurityConfig  {
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
 
-
             return     http.csrf(csrf -> csrf.disable())
-
                     .authorizeExchange(authorize -> authorize
                                     .pathMatchers(HttpMethod.PUT, "/api/v1/files/*").hasAnyAuthority("ADMIN", "MODERATOR")
                                     .pathMatchers(HttpMethod.DELETE, "/api/v1/files/*").hasAnyAuthority("ADMIN", "MODERATOR")

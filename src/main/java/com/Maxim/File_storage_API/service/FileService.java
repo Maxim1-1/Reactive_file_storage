@@ -24,8 +24,8 @@ public class FileService {
 
         return null;
     }
-    @Transactional
     public Mono<FileEntity> saveFile (FileEntity file) {
+//          TODO при сохранении file в event должна появиться связь юзер-файл
         return fileRepository.save(file);
     }
 
@@ -36,11 +36,9 @@ public class FileService {
     public Flux<FileEntity> getAllFiles() {
         return fileRepository.findAll();
     }
-    @Transactional
     public Mono<FileEntity> updateFileById(FileEntity file) {
         return fileRepository.save(file);
     }
-    @Transactional
     public Mono<FileEntity> deleteFileById(Integer id) {
         return fileRepository.findById(id)
                 .flatMap(fileEntity -> {

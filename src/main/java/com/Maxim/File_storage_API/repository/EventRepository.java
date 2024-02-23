@@ -15,15 +15,16 @@ public interface EventRepository extends ReactiveCrudRepository<EventEntity, Int
     @Query("SELECT id,status FROM rest.events where user_id=:id;")
     Flux<EventEntity> findAllIdRelatedEventsByUserId(Integer id);
 
+    //    TODO харкод таблицы
     @Modifying
     @Query("UPDATE events SET user_id = :user_id, file_id= :file_id, status = :status WHERE id = :eventId;")
-//    TODO харкод таблицы
     Mono<EventEntity> updateEventByIdAllColumns(Integer eventId, Integer user_id, Integer file_id, Status status);
 
     @Query("UPDATE events SET  status = :status WHERE id = :eventId;")
 //    TODO харкод таблицы
     Mono<EventEntity> updateEventStatus(Integer eventId,Status status);
 
+    @Modifying
     @Query("insert into events (user_id, file_id,status) values(:userId, :fileId, :status) ")
     Mono<EventEntity> insertEvent(Integer userId,Integer fileId,Status status);
 

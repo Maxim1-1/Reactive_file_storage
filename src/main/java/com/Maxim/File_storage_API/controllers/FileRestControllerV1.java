@@ -55,12 +55,9 @@ public class FileRestControllerV1 {
 
 
     @RequestMapping(value = "", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public Mono<FileEntity> saveFile(@RequestPart("file") Mono<FilePart> file) {
+    public Mono<FileDTO> saveFile(@RequestPart("file") Mono<FilePart> file) {
         String bucket = "files-strorage-repository";
         S3RepositoryImpl s3 = new  S3RepositoryImpl();
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println(authentication.getAuthorities());
 
         return file.flatMap(f -> {
             return s3.uploadFile(Mono.just(f), bucket, f.filename())
@@ -73,7 +70,7 @@ public class FileRestControllerV1 {
                         fileEntity.setStatus(Status.ACTIVE);
                         return fileEntity;
                     })
-                    .flatMap(fileService::saveFile);
+                    .flatMap(fileService::saveFile).map(fileMapper::map);
         });
     }
 
@@ -86,6 +83,11 @@ public class FileRestControllerV1 {
 
     @DeleteMapping("/{id}")
     public Mono<FileDTO> deleteFileById(@PathVariable Integer id) {
+        return fileService.deleteFileById(id).map(fileMapper::map);
+    }
+
+    @GetMapping("/history")
+    public Mono<FileDTO> history(@PathVariable Integer id) {
         return fileService.deleteFileById(id).map(fileMapper::map);
     }
 

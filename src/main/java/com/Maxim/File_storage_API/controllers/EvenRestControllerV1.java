@@ -1,9 +1,12 @@
 package com.Maxim.File_storage_API.controllers;
 
+import com.Maxim.File_storage_API.dto.EventDTO;
 import com.Maxim.File_storage_API.entity.EventEntity;
 import com.Maxim.File_storage_API.entity.FileEntity;
 import com.Maxim.File_storage_API.entity.Status;
 import com.Maxim.File_storage_API.entity.UserEntity;
+import com.Maxim.File_storage_API.mapper.EventMapper;
+import com.Maxim.File_storage_API.mapper.FileMapper;
 import com.Maxim.File_storage_API.repository.EventRepository;
 import com.Maxim.File_storage_API.service.EventService;
 import com.Maxim.File_storage_API.service.FileService;
@@ -20,8 +23,15 @@ import java.util.List;
 @RequestMapping("/api/v1/events")
 public class EvenRestControllerV1 {
 
-    @Autowired
+    public EvenRestControllerV1(EventService eventService, EventMapper eventMapper) {
+        this.eventService = eventService;
+        this.eventMapper = eventMapper;
+    }
+
     private EventService eventService;
+    private EventMapper eventMapper;
+
+
 
 
     @GetMapping("/{id}")
@@ -30,39 +40,21 @@ public class EvenRestControllerV1 {
     }
 
     @GetMapping("")
-    public Flux<EventEntity> getAllEvents() {
-        return eventService.getAllEvents();
+    public Flux<EventDTO> getAllEvents() {
+        return eventService.getAllEvents().map(eventMapper::map);
     }
 
     @PostMapping("")
-    public Mono<EventEntity> saveEvents (@RequestBody EventEntity event) {
-//        UserEntity user = new UserEntity();
-//        user.setId(1);
-//        FileEntity file = new FileEntity();
-//        file.setId(1);
-//        EventEntity event1 = new EventEntity();
-//        event1.setFile(file);
-//        event1.setStatus(Status.ACTIVE);
-//        event1.setUser(user);
-//
-        return eventService.saveEvents(event);
+    public Mono<EventDTO> saveEvents (@RequestBody EventDTO event) {
+          EventEntity eventEntity = eventMapper.map(event);
+          return eventService.saveEvent(eventEntity).map(eventMapper::map);
     }
 
     @PutMapping("/{id}")
-    public Mono<EventEntity> updateEventById(@PathVariable Integer id,@RequestBody EventEntity event) {
-//        event.setId(id);
-
-//        UserEntity user = new UserEntity();
-//        user.setId(1);
-//        FileEntity file = new FileEntity();
-//        file.setId(1);
-//        EventEntity event1 = new EventEntity();
-//        event1.setId(id);
-//        event1.setFile(file);
-//        event1.setStatus(Status.ACTIVE);
-//        event1.setUser(user);
-
-        return eventService.updateEventById(event);
+    public Mono<EventDTO> updateEventById(@PathVariable Integer id,@RequestBody EventDTO event) {
+        event.setId(id);
+        EventEntity eventEntity = eventMapper.map(event);
+        return eventService.updateEventById(eventEntity).map(eventMapper::map);
     }
 
     @DeleteMapping("/{id}")

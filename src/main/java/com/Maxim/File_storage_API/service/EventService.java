@@ -6,6 +6,7 @@ import com.Maxim.File_storage_API.entity.Status;
 import com.Maxim.File_storage_API.repository.EventRepository;
 import com.Maxim.File_storage_API.repository.FileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
@@ -19,12 +20,17 @@ public class EventService {
     private EventRepository eventRepository;
 
     @Autowired
-    private FileRepository fileRepository;
+    private  R2dbcEntityTemplate template;
 
-//
+    @Autowired
+    private FileRepository fileRepository;
 
     @Autowired
     private DatabaseClient databaseClient;
+
+    public EventService() {
+    }
+
     public Mono<EventEntity> getEventById(Integer eventId) {
         return databaseClient.sql("SELECT file_id FROM rest.events where id = :eventId")
                 .bind("eventId", eventId)
@@ -43,25 +49,39 @@ public class EventService {
         return eventRepository.findAll().flatMap(event -> getEventById(event.getId()));
     }
 
-    @Transactional
-    public Mono<EventEntity> saveEvents(EventEntity event) {
-        return eventRepository.insertEvent(event.getUser().getId(), event.getFile().getId(), event.getStatus())
-                .flatMap(savedEvent -> {
-                    EventEntity eventWithId = new EventEntity();
-                    eventWithId.setId(savedEvent.getId());
-                    eventWithId.setUser(event.getUser());
-                    eventWithId.setFile(event.getFile());
-                    eventWithId.setStatus(event.getStatus());
-                    return Mono.just(eventWithId);
-                });
+    public Mono<EventEntity> save(EventEntity p) {
+        return this.template.insert(EventEntity.class)
+                .using(p)
+                .map(post -> post);
     }
 
-    @Transactional
+//    public Mono<EventEntity> saveEvents(EventEntity event) {
+//
+//
+//        return databaseClient.sql("insert into events (user_id, file_id,status) values(:userId, :fileId, :status) ")
+//                .bind("userId",event.getUser().getId())
+//                .bind("fileId",event.getFile().getId())
+//                .bind("status",event.getStatus())
+//                .fetch();}
+
+    public Mono<EventEntity> saveEvent(EventEntity event) {
+        return databaseClient.sql("INSERT INTO events (user_id, file_id, status) VALUES (:userId, :fileId, :status) RETURNING id")
+                .bind("userId", event.getUser().getId())
+                .bind("fileId", event.getFile().getId())
+                .bind("status", event.getStatus())
+                .map((row, rowMetadata) -> row.get("id", Integer.class))
+                .one()
+                .doOnNext(eventId -> event.setId(eventId))
+                .thenReturn(event);
+    }
+
+
     public Mono<EventEntity> updateEventById(EventEntity event) {
-        return eventRepository.updateEventByIdAllColumns(event.getId(),event.getUser().getId(),event.getFile().getId(),event.getStatus());
+//        TODO когда вынесу в сервис в нем сделать проверку есть ли такой event_id
+        return eventRepository.updateEventByIdAllColumns(event.getId(),event.getUser().getId(),event.getFile().getId(),event.getStatus())
+                .then(getEventById(event.getId()));
     }
 
-    @Transactional
     public Mono<EventEntity> deleteEventById(Integer id) {
         return eventRepository.updateEventStatus(id, Status.DELETED);
 

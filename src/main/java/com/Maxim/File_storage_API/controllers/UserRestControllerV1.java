@@ -51,6 +51,7 @@ public class UserRestControllerV1 {
         return userService.updateUserById(user);
     }
 
+//    TODO разные права на историю загрузок
     @DeleteMapping("/{id}")
     public Mono<UserEntity> deleteUserById(@PathVariable Integer id) {
         return userService.deleteUserById(id);

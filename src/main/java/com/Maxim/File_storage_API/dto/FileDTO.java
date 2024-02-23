@@ -1,5 +1,6 @@
 package com.Maxim.File_storage_API.dto;
 
+import com.Maxim.File_storage_API.entity.Status;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
@@ -10,12 +11,13 @@ public class FileDTO {
     private String filePath;
     private String updatedAt;
     private String createAt;
-    private String status;
-    public String getStatus() {
+    private Status status;
+
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 

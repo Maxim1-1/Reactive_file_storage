@@ -4,7 +4,7 @@ public class HistoryDTO {
 
     private Integer id;
     private String name;
-
+    private String create_at;
     public Integer getId() {
         return id;
     }
@@ -29,6 +29,6 @@ public class HistoryDTO {
         this.create_at = create_at;
     }
 
-    private String create_at;
+
 
 }

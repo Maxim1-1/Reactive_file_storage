@@ -49,10 +49,6 @@ public class UserService  {
 
     }
 
-
-
-
-
     public Flux<UserEntity> findAllUsers() {
         return userRepository.findAll()
                 .flatMap(user -> Mono.zip(
@@ -113,7 +109,6 @@ public class UserService  {
     }
 
 
-    @Transactional
     public Mono<UserEntity> saveUser(UserEntity user) {
         return userRepository.save(user)
                 .flatMap(savedUser -> {
@@ -143,7 +138,6 @@ public class UserService  {
                 });
     }
 
-    @Transactional
     public Mono<UserEntity> updateUserById(UserEntity updatedUser) {
         return userRepository.findById(updatedUser.getId())
                 .flatMap(existingUser -> {
@@ -174,9 +168,6 @@ public class UserService  {
     }
 
 
-
-
-    @Transactional
     public Mono<UserEntity> deleteUserById(Integer id) {
 
         return userRepository.findById(id)
