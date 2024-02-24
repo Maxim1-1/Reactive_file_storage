@@ -4,6 +4,8 @@ import com.Maxim.File_storage_API.dto.HistoryDTO;
 import com.Maxim.File_storage_API.entity.*;
 import com.Maxim.File_storage_API.repository.EventRepository;
 import com.Maxim.File_storage_API.repository.file_storage.S3RepositoryImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -32,6 +34,12 @@ public class FileUserService {
     private UserService userService;
 
     private EventRepository eventRepository;
+    @Autowired
+    private S3RepositoryImpl s3;
+
+
+    @Value("${s3.bucket}")
+    private String bucket;
 
     public Flux<FileEntity> getAllFilesForRole(Collection<? extends GrantedAuthority> authorities, Integer userId) {
         for (GrantedAuthority authority : authorities) {
@@ -63,9 +71,6 @@ public class FileUserService {
     }
 
     public Mono<FileEntity> saveFile(Mono<FilePart> file, Integer userId) {
-        String bucket = "files-strorage-repository";
-        S3RepositoryImpl s3 = new S3RepositoryImpl();
-
         return file.flatMap(f -> {
             return s3.uploadFile(Mono.just(f), bucket, f.filename())
                     .flatMap(filePath -> {

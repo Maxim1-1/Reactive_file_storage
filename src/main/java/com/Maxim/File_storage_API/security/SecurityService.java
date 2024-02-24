@@ -20,15 +20,12 @@ public class SecurityService {
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
 
-//    @Value("${jwt.secret}")
-    private String secret="b5f59337a612a2a7dc07328f3e7d1a04722967c7f06df20a499a7d3f91ff2a7e";
-//    @Value("${jwt.expiration}")
-    private Long expirationInSeconds=3600L;
-//    @Value("${jwt.issuer}")
-    private String issuer="maxim";
-
-//    @Value("${jwt.lifetime}")
-    private Duration jwtLifetime=Duration.ofMinutes(60);
+    @Value("${jwt.secret}")
+    private String secret;
+    @Value("${jwt.expiration}")
+    private Integer expirationInSeconds;
+    @Value("${jwt.issuer}")
+    private String issuer;
 
 
 

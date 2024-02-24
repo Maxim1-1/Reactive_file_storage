@@ -1,6 +1,8 @@
 package com.Maxim.File_storage_API.security;
 
 
+import com.Maxim.File_storage_API.entity.Status;
+import com.Maxim.File_storage_API.entity.UserEntity;
 import com.Maxim.File_storage_API.service.UserService;
 
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
@@ -20,9 +22,8 @@ public class AuthenticationManager implements ReactiveAuthenticationManager {
     public Mono<Authentication> authenticate(Authentication authentication) {
         CustomPrincipal principal = (CustomPrincipal) authentication.getPrincipal();
         return userService.findUserById(principal.getId())
-//                TODO проверка статуса active, deleted
-//                .filter(UserEntity::isEnabled)
-                .switchIfEmpty(Mono.error(new RuntimeException("User disabled")))
+                .filter(user -> user.getStatus().equals(Status.ACTIVE.ACTIVE))
+                .switchIfEmpty(Mono.error(new RuntimeException("User deleted")))
                 .map(user -> authentication);
     }
 }

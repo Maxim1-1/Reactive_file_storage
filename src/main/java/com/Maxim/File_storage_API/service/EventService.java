@@ -21,22 +21,9 @@ public class EventService {
     @Autowired
     private EventRepository eventRepository;
 
-    @Autowired
-    private  R2dbcEntityTemplate template;
-
-    @Autowired
-    private FileRepository fileRepository;
-
-    @Autowired
-    private UserRepository userRepository;
-
-
-    @Autowired
-    private DatabaseClient databaseClient;
 
     public EventService() {
     }
-
 
 
     public Mono<EventEntity> getEventById(Integer eventId) {

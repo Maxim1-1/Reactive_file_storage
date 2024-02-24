@@ -18,20 +18,6 @@ public class UserService  {
 
     @Autowired
     private UserRepository userRepository;
-    @Autowired
-    private EventRepository eventRepository;
-    @Autowired
-    private FileRepository fileRepository;
-
-    private FileService fileService;
-    private EventService eventService;
-
-
-
-
-
-    @Autowired
-    private DatabaseClient databaseClient;
 
     private final PasswordEncoder passwordEncoder = new PBFDK2Encoder();
 
