@@ -10,8 +10,8 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface EventMapper {
-    EventDTO map(EventEntity userEntity);
+    EventDTO map(EventEntity eventEntity);
 
     @InheritInverseConfiguration
-    EventEntity map(EventDTO dto);
+    EventEntity map(EventDTO eventDTO);
 }

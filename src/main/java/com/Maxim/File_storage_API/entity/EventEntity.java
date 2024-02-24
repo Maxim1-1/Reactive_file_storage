@@ -11,13 +11,35 @@ public class EventEntity {
     @Id
     private Integer id;
 
+    @Column("user_id")
+    private Integer userId ;
+    @Column("file_id")
+    private Integer fileId ;
+    private Status status;
+
     @Transient
-    private UserEntity userEntity;
+    private UserEntity user;
 
     @Transient
     private FileEntity file;
 
-    private Status status;
+
+
+    public Integer getFileId() {
+        return fileId;
+    }
+
+    public void setFileId(Integer fileId) {
+        this.fileId = fileId;
+    }
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
 
     public Status getStatus() {
         return status;
@@ -36,11 +58,11 @@ public class EventEntity {
     }
 
     public UserEntity getUser() {
-        return userEntity;
+        return user;
     }
 
     public void setUser(UserEntity userEntity) {
-        this.userEntity = userEntity;
+        this.user = userEntity;
     }
 
     public FileEntity getFile() {

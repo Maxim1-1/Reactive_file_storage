@@ -16,3 +16,5 @@ jwt:
   expiration: 3600
   issuer: maxim
   lifetime: 10m
+
+s3:

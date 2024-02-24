@@ -4,13 +4,14 @@ import com.Maxim.File_storage_API.entity.EventEntity;
 import com.Maxim.File_storage_API.entity.Status;
 import org.springframework.data.r2dbc.repository.Modifying;
 import org.springframework.data.r2dbc.repository.Query;
+import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Repository
-public interface EventRepository extends ReactiveCrudRepository<EventEntity, Integer> {
+public interface EventRepository extends R2dbcRepository<EventEntity, Integer> {
 
     @Query("SELECT id,status FROM rest.events where user_id=:id;")
     Flux<EventEntity> findAllIdRelatedEventsByUserId(Integer id);

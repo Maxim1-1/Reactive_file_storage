@@ -8,7 +8,6 @@ import com.Maxim.File_storage_API.repository.FileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import org.springframework.r2dbc.core.DatabaseClient;
@@ -31,6 +30,12 @@ public class EventService {
     public EventService() {
     }
 
+
+    public Mono<EventEntity> getEventByIdv2(Integer eventId) {
+        return eventRepository.findById(eventId);
+    }
+
+
     public Mono<EventEntity> getEventById(Integer eventId) {
         return databaseClient.sql("SELECT file_id FROM rest.events where id = :eventId")
                 .bind("eventId", eventId)
@@ -49,20 +54,19 @@ public class EventService {
         return eventRepository.findAll().flatMap(event -> getEventById(event.getId()));
     }
 
-    public Mono<EventEntity> save(EventEntity p) {
-        return this.template.insert(EventEntity.class)
-                .using(p)
-                .map(post -> post);
+    public Flux<EventEntity> getAllEvents2() {
+        return eventRepository.findAll();
     }
 
-//    public Mono<EventEntity> saveEvents(EventEntity event) {
-//
-//
-//        return databaseClient.sql("insert into events (user_id, file_id,status) values(:userId, :fileId, :status) ")
-//                .bind("userId",event.getUser().getId())
-//                .bind("fileId",event.getFile().getId())
-//                .bind("status",event.getStatus())
-//                .fetch();}
+//    public Mono<EventEntity> save(EventEntity p) {
+//        return this.template.insert(EventEntity.class)
+//                .using(p)
+//                .map(post -> post);
+//    }
+
+    public Mono<EventEntity> sa1veEvents(EventEntity event) {
+        return eventRepository.save(event);
+    }
 
     public Mono<EventEntity> saveEvent(EventEntity event, Integer userId) {
         return databaseClient.sql("INSERT INTO events (user_id, file_id, status) VALUES (:userId, :fileId, :status)")

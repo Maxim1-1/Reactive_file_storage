@@ -48,15 +48,13 @@ public class EvenRestControllerV1 {
     public Mono<EventDTO> saveEvents(@RequestBody EventDTO event, Authentication authentication) {
         CustomPrincipal userDetails = (CustomPrincipal) authentication.getPrincipal();
         Integer userId = userDetails.getId();
+        event.setUserId(userId);
+
         EventEntity eventEntity = eventMapper.map(event);
-        return eventService.saveEvent(eventEntity,userId).map(eventMapper::map);
+
+        return eventService.sa1veEvents(eventEntity).map(eventMapper::map);
     }
 
-    @PostMapping("t")
-    public Mono<EventDTO> sagveEvents(@RequestBody EventDTO event) {
-        EventEntity eventEntity = eventMapper.map(event);
-        return eventService.save(eventEntity).map(eventMapper::map);
-    }
 
     @PutMapping("/{id}")
     public Mono<EventDTO> updateEventById(@PathVariable Integer id, @RequestBody EventDTO event) {

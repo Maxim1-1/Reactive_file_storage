@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
-//    @Mapping(target = "modificationTime", ignore = true)
+
     UserDTO map(UserEntity userEntity);
 
     @InheritInverseConfiguration

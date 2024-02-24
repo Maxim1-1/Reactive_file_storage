@@ -1,5 +1,7 @@
 package com.Maxim.File_storage_API.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -8,12 +10,35 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 public class EventDTO {
 
     private Integer id;
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private UserDTO user;
 
-//    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private FileDTO file;
+    private Integer userId ;
+    private Integer fileId ;
     private String status;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private UserDTO user;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+
+    private FileDTO file;
+
+
+    //    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    public Integer getFileId() {
+        return fileId;
+    }
+
+    public void setFileId(Integer fileId) {
+        this.fileId = fileId;
+    }
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
     public Integer getId() {
         return id;
     }
