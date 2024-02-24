@@ -1,7 +1,13 @@
 server:
-  port: 8080
+
+
+    port: 8080
 
 spring:
+  mvc:
+    problemdetails:
+      enabled: true
+
   r2dbc:
     url: r2dbc:mysql://localhost:3306/rest
     username: root

@@ -5,6 +5,8 @@ import com.Maxim.File_storage_API.entity.EventEntity;
 import com.Maxim.File_storage_API.entity.Status;
 import com.Maxim.File_storage_API.repository.EventRepository;
 import com.Maxim.File_storage_API.repository.FileRepository;
+import com.Maxim.File_storage_API.repository.UserRepository;
+import io.r2dbc.spi.R2dbcDataIntegrityViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.stereotype.Service;
@@ -25,60 +27,52 @@ public class EventService {
     private FileRepository fileRepository;
 
     @Autowired
+    private UserRepository userRepository;
+
+
+    @Autowired
     private DatabaseClient databaseClient;
 
     public EventService() {
     }
 
 
-    public Mono<EventEntity> getEventByIdv2(Integer eventId) {
+
+    public Mono<EventEntity> getEventById(Integer eventId) {
         return eventRepository.findById(eventId);
     }
 
-
-    public Mono<EventEntity> getEventById(Integer eventId) {
-        return databaseClient.sql("SELECT file_id FROM rest.events where id = :eventId")
-                .bind("eventId", eventId)
-                .map(row -> row.get("file_id", Integer.class))
-                .one()
-                .flatMap(fileId -> fileRepository.findById(fileId)
-                        .flatMap(file -> eventRepository.findById(eventId)
-                                .map(event -> {
-                                    event.setFile(file);
-                                    return event;
-                                })
-                        )
-                );
-    }
     public Flux<EventEntity> getAllEvents() {
-        return eventRepository.findAll().flatMap(event -> getEventById(event.getId()));
-    }
-
-    public Flux<EventEntity> getAllEvents2() {
         return eventRepository.findAll();
     }
 
-//    public Mono<EventEntity> save(EventEntity p) {
-//        return this.template.insert(EventEntity.class)
-//                .using(p)
-//                .map(post -> post);
-//    }
+    public Mono<EventEntity> saveEvents2(EventEntity event)  {
 
-    public Mono<EventEntity> sa1veEvents(EventEntity event) {
         return eventRepository.save(event);
     }
 
-    public Mono<EventEntity> saveEvent(EventEntity event, Integer userId) {
-        return databaseClient.sql("INSERT INTO events (user_id, file_id, status) VALUES (:userId, :fileId, :status)")
-                .bind("userId", userId)
-                .bind("fileId", event.getFile().getId())
-                .bind("status", event.getStatus())
-                .fetch()
-                .rowsUpdated()
-                .flatMap(rowsUpdated -> databaseClient.sql("SELECT last_insert_id() as id").map((row, rowMetadata) -> row.get("id", Integer.class)).one())
-                .doOnNext(eventId -> event.setId(eventId))
-                .thenReturn(event);
+
+    public Mono<EventEntity> saveEvents(EventEntity event) throws R2dbcDataIntegrityViolationException{
+        Mono<Boolean> userExists = userRepository.existsById(event.getUserId());
+        Mono<Boolean> fileExists = fileRepository.existsById(event.getFileId());
+
+        return Mono.zip(userExists, fileExists)
+                .flatMap(tuple -> {
+                    if (!tuple.getT1() && !tuple.getT2()) {
+                       throw  new R2dbcDataIntegrityViolationException("User with id " + event.getUserId() + " and File with id " + event.getFileId() + " not found");
+                    } else if (!tuple.getT1()) {
+                        return Mono.error(new R2dbcDataIntegrityViolationException("User with id " + event.getUserId() + " not found"));
+                    } else if (!tuple.getT2()) {
+                        return Mono.error(new R2dbcDataIntegrityViolationException("File with id " + event.getFileId() + " not found"));
+                    } else {
+                        return eventRepository.save(event);
+                    }
+                })
+                .switchIfEmpty(Mono.error(new R2dbcDataIntegrityViolationException("Bad Request")));
     }
+
+
+
 
 
     public Mono<EventEntity> updateEventById(EventEntity event) {

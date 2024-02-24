@@ -2,24 +2,17 @@ package com.Maxim.File_storage_API.controllers;
 
 import com.Maxim.File_storage_API.dto.EventDTO;
 import com.Maxim.File_storage_API.entity.EventEntity;
-import com.Maxim.File_storage_API.entity.FileEntity;
-import com.Maxim.File_storage_API.entity.Status;
-import com.Maxim.File_storage_API.entity.UserEntity;
 import com.Maxim.File_storage_API.mapper.EventMapper;
-import com.Maxim.File_storage_API.mapper.FileMapper;
-import com.Maxim.File_storage_API.repository.EventRepository;
 import com.Maxim.File_storage_API.security.CustomPrincipal;
 import com.Maxim.File_storage_API.service.EventService;
-import com.Maxim.File_storage_API.service.FileService;
-import com.Maxim.File_storage_API.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.r2dbc.spi.R2dbcDataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/events")
@@ -35,8 +28,8 @@ public class EvenRestControllerV1 {
 
 
     @GetMapping("/{id}")
-    public Mono<EventEntity> getEventById(@PathVariable Integer id) {
-        return eventService.getEventById(id);
+    public Mono<EventDTO> getEventById(@PathVariable Integer id) {
+        return eventService.getEventById(id).map(eventMapper::map);
     }
 
     @GetMapping("")
@@ -44,15 +37,17 @@ public class EvenRestControllerV1 {
         return eventService.getAllEvents().map(eventMapper::map);
     }
 
+
+
+
     @PostMapping("")
-    public Mono<EventDTO> saveEvents(@RequestBody EventDTO event, Authentication authentication) {
-        CustomPrincipal userDetails = (CustomPrincipal) authentication.getPrincipal();
-        Integer userId = userDetails.getId();
-        event.setUserId(userId);
-
-        EventEntity eventEntity = eventMapper.map(event);
-
-        return eventService.sa1veEvents(eventEntity).map(eventMapper::map);
+    public Mono<ResponseEntity<EventDTO>> saveEvents(@RequestBody EventDTO event) {
+        return eventService.saveEvents(eventMapper.map(event))
+                .map(eventMapper::map)
+                .map(ResponseEntity::ok)
+                .onErrorResume(R2dbcDataIntegrityViolationException.class, e -> {
+                    return Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage()));
+                });
     }
 
 
