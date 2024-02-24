@@ -11,14 +11,5 @@ import reactor.core.publisher.Mono;
 
 @Repository
 public interface FileRepository extends ReactiveCrudRepository<FileEntity, Integer> {
-
-//    @Query("SELECT * FROM rest.files where id=:id;")
-//        //    TODO харкод таблицы
-//    Mono<FileEntity> findByFileId(Integer id);
-
-    @Query("UPDATE files SET  status = :status WHERE id = :fileId;")
-//    TODO харкод таблицы
-    Mono<FileEntity> updateFileStatus(Integer fileId, Status status);
-
-
+    Flux<FileEntity> findAllById(Integer fileID);
 }

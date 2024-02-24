@@ -1,34 +1,46 @@
 package com.Maxim.File_storage_API.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class HistoryDTO {
 
-    private Integer id;
-    private String name;
-    private String create_at;
-    public Integer getId() {
-        return id;
+    private Integer fileId;
+    private String fileName;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String author;
+    private String createAt;
+    public Integer getFileId() {
+        return fileId;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setFileId(Integer fileId) {
+        this.fileId = fileId;
     }
 
-    public String getName() {
-        return name;
+    public String getFileName() {
+        return fileName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
-    public String getCreate_at() {
-        return create_at;
+    public String getCreateAt() {
+        return createAt;
     }
 
-    public void setCreate_at(String create_at) {
-        this.create_at = create_at;
+    public void setCreateAt(String createAt) {
+        this.createAt = createAt;
     }
 
+    public String getAuthor() {
+        return author;
+    }
 
-
+    public void setAuthor(String author) {
+        this.author = author;
+    }
 }

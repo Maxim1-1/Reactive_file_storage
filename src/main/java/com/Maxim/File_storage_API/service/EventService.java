@@ -2,6 +2,7 @@ package com.Maxim.File_storage_API.service;
 
 
 import com.Maxim.File_storage_API.entity.EventEntity;
+import com.Maxim.File_storage_API.entity.FileEntity;
 import com.Maxim.File_storage_API.entity.Status;
 import com.Maxim.File_storage_API.repository.EventRepository;
 import com.Maxim.File_storage_API.repository.FileRepository;
@@ -46,45 +47,44 @@ public class EventService {
         return eventRepository.findAll();
     }
 
-    public Mono<EventEntity> saveEvents2(EventEntity event)  {
-
+    public Mono<EventEntity> saveEvents(EventEntity event)  {
         return eventRepository.save(event);
     }
 
-
-    public Mono<EventEntity> saveEvents(EventEntity event) throws R2dbcDataIntegrityViolationException{
-        Mono<Boolean> userExists = userRepository.existsById(event.getUserId());
-        Mono<Boolean> fileExists = fileRepository.existsById(event.getFileId());
-
-        return Mono.zip(userExists, fileExists)
-                .flatMap(tuple -> {
-                    if (!tuple.getT1() && !tuple.getT2()) {
-                       throw  new R2dbcDataIntegrityViolationException("User with id " + event.getUserId() + " and File with id " + event.getFileId() + " not found");
-                    } else if (!tuple.getT1()) {
-                        return Mono.error(new R2dbcDataIntegrityViolationException("User with id " + event.getUserId() + " not found"));
-                    } else if (!tuple.getT2()) {
-                        return Mono.error(new R2dbcDataIntegrityViolationException("File with id " + event.getFileId() + " not found"));
+    public Mono<EventEntity> updateEventById(EventEntity event, Integer eventId) {
+        return eventRepository.existsById(eventId)
+                .flatMap(exists -> {
+                    if (exists) {
+                        event.setId(eventId);
+                        return eventRepository.findById(eventId)
+                                .map(eventRepository -> {
+                                    if (event.getFileId()!=null & event.getFileId()!=(eventRepository.getFileId())) {
+                                        eventRepository.setFileId(event.getFileId());
+                                    }
+                                    if (event.getUserId()!=null & event.getUserId()!=(eventRepository.getUserId())) {
+                                        eventRepository.setUserId(event.getUserId());
+                                    }
+                                    if (event.getStatus()!=null & event.getStatus()!=(eventRepository.getStatus())) {
+                                        eventRepository.setStatus(event.getStatus());
+                                    }
+                                    return eventRepository;
+                                })
+                                .flatMap(updatedEvent -> eventRepository.save(updatedEvent));
                     } else {
-                        return eventRepository.save(event);
+                        return Mono.error(new Exception("Event does not exist"));
                     }
-                })
-                .switchIfEmpty(Mono.error(new R2dbcDataIntegrityViolationException("Bad Request")));
+                });
     }
 
-
-
-
-
-    public Mono<EventEntity> updateEventById(EventEntity event) {
-//        TODO когда вынесу в сервис в нем сделать проверку есть ли такой event_id
-        return eventRepository.updateEventByIdAllColumns(event.getId(),event.getUser().getId(),event.getFile().getId(),event.getStatus())
-                .then(getEventById(event.getId()));
-    }
 
     public Mono<EventEntity> deleteEventById(Integer id) {
-        return eventRepository.updateEventStatus(id, Status.DELETED);
-
+        return eventRepository.findById(id)
+                .flatMap(fileEntity -> {
+                    fileEntity.setStatus(Status.DELETED);
+                    return eventRepository.save(fileEntity);
+                });
     }
+
 
 
 

@@ -1,9 +1,9 @@
 package com.Maxim.File_storage_API.service;
 
+import com.Maxim.File_storage_API.dto.HistoryDTO;
 import com.Maxim.File_storage_API.entity.*;
 import com.Maxim.File_storage_API.repository.EventRepository;
 import com.Maxim.File_storage_API.repository.file_storage.S3RepositoryImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -18,20 +18,20 @@ import java.util.Collection;
 @Service
 public class FileUserService {
 
-    public FileUserService(FileService fileService, EventRepository eventRepository) {
+    public FileUserService(FileService fileService, EventService eventService, EventRepository eventRepository, UserService userService) {
         this.fileService = fileService;
+        this.eventService = eventService;
         this.eventRepository = eventRepository;
+        this.userService = userService;
     }
 
-    @Autowired
     private FileService fileService;
 
-    @Autowired
     private EventService eventService;
 
-    @Autowired
-    private EventRepository eventRepository;
+    private UserService userService;
 
+    private EventRepository eventRepository;
 
     public Flux<FileEntity> getAllFilesForRole(Collection<? extends GrantedAuthority> authorities, Integer userId) {
         for (GrantedAuthority authority : authorities) {
@@ -44,12 +44,12 @@ public class FileUserService {
         return null;
     }
 
-    public Mono<FileEntity> getFileByIDForRole(Collection<? extends GrantedAuthority> authorities, Integer userId, Integer fileId) {
+    public Mono<FileEntity> getFileByIdForRole(Collection<? extends GrantedAuthority> authorities, Integer userId, Integer fileId) {
         for (GrantedAuthority authority : authorities) {
             if (authority.getAuthority().equals(String.valueOf(Role.ADMIN)) || authority.getAuthority().equals(String.valueOf(Role.MODERATOR))) {
                 return fileService.getFileById(fileId);
             } else if (authority.getAuthority().equals(String.valueOf(Role.USER))) {
-                return eventRepository.findFileByUserId(userId, fileId)
+                return eventRepository.findByUserIdAndFileId(userId, fileId)
                         .flatMap(eventEntity -> {
                             if (eventEntity != null) {
                                 return fileService.getFileById(fileId);
@@ -65,11 +65,10 @@ public class FileUserService {
     public Mono<FileEntity> saveFile(Mono<FilePart> file, Integer userId) {
         String bucket = "files-strorage-repository";
         S3RepositoryImpl s3 = new S3RepositoryImpl();
-//        TODO add events
 
         return file.flatMap(f -> {
             return s3.uploadFile(Mono.just(f), bucket, f.filename())
-                    .map(filePath -> {
+                    .flatMap(filePath -> {
                         FileEntity fileEntity = new FileEntity();
                         fileEntity.setFilePath(filePath);
                         fileEntity.setName(f.filename());
@@ -77,21 +76,50 @@ public class FileUserService {
                         fileEntity.setUpdatedAt(String.valueOf(LocalDate.now()));
                         fileEntity.setStatus(Status.ACTIVE);
 
+                        return fileService.saveFile(fileEntity)
+                                .flatMap(savedFileEntity -> {
+                                    EventEntity eventEntity = new EventEntity();
+                                    eventEntity.setFileId(savedFileEntity.getId());
+                                    eventEntity.setUserId(userId);
 
-                        UserEntity user = new UserEntity();
-                        user.setId(userId);
-
-                        EventEntity eventEntity = new EventEntity();
-                        eventEntity.setUser(user);
-                        eventEntity.setFile(fileEntity);
-                        eventEntity.setStatus(Status.ACTIVE);
-
-//                        eventService.save(eventEntity);
-                        return fileEntity;
-                    })
-                    .flatMap(fileService::saveFile);
+                                    return eventService.saveEvents(eventEntity)
+                                            .thenReturn(savedFileEntity);
+                                });
+                    });
         });
-
-
     }
+
+
+    public Flux<HistoryDTO> getHistory(Collection<? extends GrantedAuthority> authorities, Integer userId) {
+        return Flux.fromIterable(authorities)
+                .flatMap(authority -> {
+                    if (authority.getAuthority().equals(String.valueOf(Role.USER))) {
+                        return fileService.getFilesByUserId(userId)
+                                .map(file -> {
+                                    HistoryDTO historyDTO = new HistoryDTO();
+                                    historyDTO.setCreateAt(file.getCreateAt());
+                                    historyDTO.setFileId(file.getId());
+                                    historyDTO.setFileName(file.getName());
+                                    return historyDTO;
+                                });
+                    } else if (authority.getAuthority().equals(String.valueOf(Role.ADMIN)) || authority.getAuthority().equals(String.valueOf(Role.MODERATOR))) {
+                        return userService.findAllUsers()
+                                .flatMap(user -> fileService.getFilesByUserId(user.getId())
+                                        .map(file -> {
+                                            HistoryDTO historyDTO = new HistoryDTO();
+                                            historyDTO.setAuthor(user.getName());
+                                            historyDTO.setCreateAt(file.getCreateAt());
+                                            historyDTO.setFileId(file.getId());
+                                            historyDTO.setFileName(file.getName());
+                                            return historyDTO;
+                                        }));
+                    } else {
+                        return Flux.empty();
+                    }
+                });
+    }
+
 }
+
+
+
