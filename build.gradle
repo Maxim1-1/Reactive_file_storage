@@ -34,7 +34,6 @@ dependencies {
 	annotationProcessor "org.mapstruct:mapstruct-processor:$mapStructVersion"
 	implementation "org.mapstruct:mapstruct:$mapStructVersion"
 
-
 	implementation "jakarta.xml.bind:jakarta.xml.bind-api:$jakartaXmlBind"
 	implementation "org.glassfish.jaxb:jaxb-runtime:$jakartaXmlBind"
 
