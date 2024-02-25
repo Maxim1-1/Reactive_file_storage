@@ -2,9 +2,8 @@ package com.Maxim.File_storage_API.security;
 
 
 import com.Maxim.File_storage_API.entity.Status;
-import com.Maxim.File_storage_API.entity.UserEntity;
+import com.Maxim.File_storage_API.exceptions.security_exeptions.UserNotAuthenticatedException;
 import com.Maxim.File_storage_API.service.UserService;
-
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -22,8 +21,8 @@ public class AuthenticationManager implements ReactiveAuthenticationManager {
     public Mono<Authentication> authenticate(Authentication authentication) {
         CustomPrincipal principal = (CustomPrincipal) authentication.getPrincipal();
         return userService.findUserById(principal.getId())
-                .filter(user -> user.getStatus().equals(Status.ACTIVE.ACTIVE))
-                .switchIfEmpty(Mono.error(new RuntimeException("Authentication is not possible the user has been deleted")))
+                .filter(user -> user.getStatus().equals(Status.ACTIVE))
+                .switchIfEmpty(Mono.error(new UserNotAuthenticatedException("Authentication is not possible, the user has been deleted")))
                 .map(user -> authentication);
     }
 }

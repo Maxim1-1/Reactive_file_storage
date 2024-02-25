@@ -1,6 +1,6 @@
 package com.Maxim.File_storage_API.exceptions.service_exceptions;
 
-public class NotFoundError {
+public class NotExistError {
 
     private String message;
 
@@ -13,10 +13,10 @@ public class NotFoundError {
         this.message = message;
     }
 
-    public NotFoundError() {
+    public NotExistError() {
     }
 
-    public NotFoundError(String message) {
+    public NotExistError(String message) {
         this.message = message;
     }
 }

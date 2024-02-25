@@ -1,6 +1,6 @@
 package com.Maxim.File_storage_API.exceptions.service_exceptions;
 
-public class UserAndFilesNotExistException extends NotFoundException {
+public class UserAndFilesNotExistException extends NotExistException {
 
     private final String messageTemplate = "User with id %d and file with id %d not exist";
 

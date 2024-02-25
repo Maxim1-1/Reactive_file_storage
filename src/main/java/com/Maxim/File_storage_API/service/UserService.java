@@ -4,8 +4,6 @@ package com.Maxim.File_storage_API.service;
 import com.Maxim.File_storage_API.entity.*;
 import com.Maxim.File_storage_API.exceptions.service_exceptions.UserNotExistException;
 import com.Maxim.File_storage_API.repository.UserRepository;
-import com.Maxim.File_storage_API.security.PBFDK2Encoder;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -14,10 +12,14 @@ import reactor.core.publisher.Mono;
 @Service
 public class UserService {
 
-    @Autowired
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+
     private UserRepository userRepository;
 
-    private final PasswordEncoder passwordEncoder = new PBFDK2Encoder();
+    private final PasswordEncoder passwordEncoder;
 
     public Mono<UserEntity> registerUser(UserEntity user) {
         UserEntity createUser = new UserEntity();

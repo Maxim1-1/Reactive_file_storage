@@ -1,6 +1,6 @@
 package com.Maxim.File_storage_API.exceptions.service_exceptions;
 
-public abstract class NotFoundException extends Throwable{
+public abstract class NotExistException extends RuntimeException {
     private Integer id;
     private String message;
 
@@ -20,10 +20,10 @@ public abstract class NotFoundException extends Throwable{
         this.message = message;
     }
 
-    public NotFoundException() {
+    public NotExistException() {
     }
 
-    public NotFoundException(String message) {
+    public NotExistException(String message) {
         this.message = message;
     }
 }

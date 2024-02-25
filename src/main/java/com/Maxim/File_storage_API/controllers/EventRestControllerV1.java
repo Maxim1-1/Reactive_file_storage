@@ -3,14 +3,8 @@ package com.Maxim.File_storage_API.controllers;
 import com.Maxim.File_storage_API.dto.EventDTO;
 import com.Maxim.File_storage_API.entity.EventEntity;
 import com.Maxim.File_storage_API.mapper.EventMapper;
-import com.Maxim.File_storage_API.repository.EventRepository;
 import com.Maxim.File_storage_API.service.EventService;
-import io.r2dbc.spi.R2dbcDataIntegrityViolationException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -35,7 +29,6 @@ public class EventRestControllerV1 {
     public Flux<EventDTO> getAllEvents() {
         return eventService.getAllEvents().map(eventMapper::map);
     }
-
 
 
     @PostMapping("")

@@ -1,9 +1,7 @@
 package com.Maxim.File_storage_API.mapper;
 
 import com.Maxim.File_storage_API.dto.FileDTO;
-import com.Maxim.File_storage_API.dto.UserDTO;
 import com.Maxim.File_storage_API.entity.FileEntity;
-import com.Maxim.File_storage_API.entity.UserEntity;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 

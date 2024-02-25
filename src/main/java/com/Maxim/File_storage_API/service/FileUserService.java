@@ -4,7 +4,6 @@ import com.Maxim.File_storage_API.dto.HistoryDTO;
 import com.Maxim.File_storage_API.entity.*;
 import com.Maxim.File_storage_API.repository.EventRepository;
 import com.Maxim.File_storage_API.repository.file_storage.S3RepositoryImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.security.core.GrantedAuthority;
@@ -20,11 +19,12 @@ import java.util.Collection;
 @Service
 public class FileUserService {
 
-    public FileUserService(FileService fileService, EventService eventService, EventRepository eventRepository, UserService userService) {
+    public FileUserService(FileService fileService, EventService eventService, EventRepository eventRepository, UserService userService, S3RepositoryImpl s3) {
         this.fileService = fileService;
         this.eventService = eventService;
         this.eventRepository = eventRepository;
         this.userService = userService;
+        this.s3 = s3;
     }
 
     private FileService fileService;
@@ -34,9 +34,8 @@ public class FileUserService {
     private UserService userService;
 
     private EventRepository eventRepository;
-    @Autowired
-    private S3RepositoryImpl s3;
 
+    private S3RepositoryImpl s3;
 
     @Value("${s3.bucket}")
     private String bucket;

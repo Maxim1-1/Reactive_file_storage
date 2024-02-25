@@ -1,5 +1,6 @@
 package com.Maxim.File_storage_API.security;
 
+import com.Maxim.File_storage_API.exceptions.security_exeptions.InvalidCredentialsException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import reactor.core.publisher.Mono;
@@ -17,7 +18,7 @@ public class JwtHandler {
 
     public Mono<VerificationResult> check(String accessToken) {
         return Mono.just(verify(accessToken))
-                .onErrorResume(e -> Mono.error(new RuntimeException("Uthorization error"+e.getMessage())));
+                .onErrorResume(e -> Mono.error(new InvalidCredentialsException("Invalid token")));
     }
 
     private VerificationResult verify(String token) {
@@ -29,6 +30,7 @@ public class JwtHandler {
         }
 
         return new VerificationResult(claims, token);
+
     }
 
 

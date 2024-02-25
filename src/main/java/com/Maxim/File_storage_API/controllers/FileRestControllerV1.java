@@ -17,8 +17,6 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("/api/v1/files")
 public class FileRestControllerV1 {
-
-
     public FileRestControllerV1(FileMapper fileMapper, FileService fileService, FileUserService fileUserService) {
         this.fileMapper = fileMapper;
         this.fileService = fileService;
@@ -27,9 +25,9 @@ public class FileRestControllerV1 {
 
     private FileMapper fileMapper;
 
-    private final FileService fileService;
+    private  FileService fileService;
 
-    private final FileUserService fileUserService;
+    private  FileUserService fileUserService;
 
 
     @GetMapping("/{fileId}")

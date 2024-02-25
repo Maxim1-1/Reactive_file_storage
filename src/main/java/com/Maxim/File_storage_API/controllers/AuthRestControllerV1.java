@@ -7,7 +7,6 @@ import com.Maxim.File_storage_API.entity.UserEntity;
 import com.Maxim.File_storage_API.mapper.UserMapper;
 import com.Maxim.File_storage_API.security.SecurityService;
 import com.Maxim.File_storage_API.service.UserService;
-import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -21,10 +20,9 @@ public class AuthRestControllerV1 {
         this.userMapper = userMapper;
     }
 
-    private final SecurityService securityService;
-    private final UserService userService;
-
-    private final UserMapper userMapper;
+    private  SecurityService securityService;
+    private  UserService userService;
+    private  UserMapper userMapper;
 
 
     @PostMapping("/register")
@@ -34,18 +32,10 @@ public class AuthRestControllerV1 {
                 .map(userMapper::map);
     }
 
-    @PostMapping("/register1")
-    public Mono<UserEntity> register1(@RequestBody UserEntity dto) {
-
-        return userService.registerUser(dto);
-
-    }
-
     @PostMapping("/login")
     public Mono<AuthResponseDto> login(@RequestBody AuthRequestDto dto) {
 
         return securityService.authenticate(dto.getName(), dto.getPassword())
-
                 .flatMap(tokenDetails -> {
                     AuthResponseDto response = new AuthResponseDto();
                     response.setUserId(tokenDetails.getUserId());
@@ -55,6 +45,5 @@ public class AuthRestControllerV1 {
                     return Mono.just(response);
 
                 });
-
     }
 }

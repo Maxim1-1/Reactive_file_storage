@@ -6,7 +6,6 @@ import com.Maxim.File_storage_API.entity.Status;
 import com.Maxim.File_storage_API.exceptions.service_exceptions.FileNotExistException;
 import com.Maxim.File_storage_API.repository.EventRepository;
 import com.Maxim.File_storage_API.repository.FileRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -16,10 +15,14 @@ import java.time.LocalDate;
 @Service
 public class FileService {
 
-    @Autowired
+
+    public FileService(FileRepository fileRepository, EventRepository eventRepository) {
+        this.fileRepository = fileRepository;
+        this.eventRepository = eventRepository;
+    }
+
     private FileRepository fileRepository;
 
-    @Autowired
     private EventRepository eventRepository;
 
     public Flux<FileEntity> getFilesByUserId(Integer userId) {

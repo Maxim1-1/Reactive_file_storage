@@ -1,9 +1,5 @@
 package com.Maxim.File_storage_API.config;
 
-
-
-
-
 import com.Maxim.File_storage_API.security.AuthenticationManager;
 import com.Maxim.File_storage_API.security.BearerTokenServerAuthenticationConverter;
 import com.Maxim.File_storage_API.security.JwtHandler;
@@ -13,54 +9,49 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
-import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
-import org.springframework.security.web.server.util.matcher.NegatedServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.http.HttpMethod;
+
 
 @Configuration
 @EnableReactiveMethodSecurity
 @EnableWebFluxSecurity
-public class WebSecurityConfig  {
+public class WebSecurityConfig {
 
     @Value("${jwt.secret}")
     private String secret;
 
-    private final String[] publicRoutes = {"/api/v1/auth/register", "/api/v1/auth/login"};
-
-
     @Bean
-    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
+    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http, AuthenticationManager authenticationManager)  {
 
-            return     http.csrf(csrf -> csrf.disable())
-                    .authorizeExchange(authorize -> authorize
-                                    .pathMatchers(HttpMethod.PUT, "/api/v1/files/*").hasAnyAuthority("ADMIN", "MODERATOR")
-                                    .pathMatchers(HttpMethod.DELETE, "/api/v1/files/*").hasAnyAuthority("ADMIN", "MODERATOR")
-                                    .pathMatchers(HttpMethod.GET, "/api/v1/users/*").hasAnyAuthority( "MODERATOR")
-                                    .pathMatchers( "/api/v1/users/*").hasAnyAuthority( "ADMIN")
-                                    .pathMatchers("/api/v1/events/*").hasAnyAuthority( "ADMIN", "MODERATOR")
-                        .pathMatchers("/api/v1/auth/register","/api/v1/auth/login")
-                            .permitAll()
-                            .anyExchange().authenticated()
-                        )
-                    .addFilterAfter(bearerAuthenticationFilter(authenticationManager), SecurityWebFiltersOrder.AUTHENTICATION)
-                    .build();
-
+        return http.csrf(csrf -> csrf.disable())
+                .authorizeExchange(authorize -> authorize
+                        .pathMatchers(HttpMethod.GET,"/api/v1/events*").hasAnyAuthority("ADMIN", "MODERATOR")
+                        .pathMatchers(HttpMethod.GET,"/api/v1/events/*").hasAnyAuthority("ADMIN", "MODERATOR")
+                        .pathMatchers(HttpMethod.PUT, "/api/v1/files/*").hasAnyAuthority("ADMIN", "MODERATOR")
+                        .pathMatchers(HttpMethod.PUT, "/api/v1/files*").hasAnyAuthority("ADMIN", "MODERATOR")
+                        .pathMatchers(HttpMethod.DELETE, "/api/v1/files").hasAnyAuthority("ADMIN", "MODERATOR")
+                        .pathMatchers(HttpMethod.DELETE, "/api/v1/files/*").hasAnyAuthority("ADMIN", "MODERATOR")
+                        .pathMatchers(HttpMethod.GET, "/api/v1/users/*").hasAnyAuthority("MODERATOR")
+                        .pathMatchers(HttpMethod.GET, "/api/v1/users").hasAnyAuthority("MODERATOR")
+                        .pathMatchers("/api/v1/users/*").hasAnyAuthority("ADMIN")
+                        .pathMatchers("/api/v1/auth/register", "/api/v1/auth/login")
+                        .permitAll()
+                        .anyExchange().authenticated()
+                )
+                .addFilterAfter(bearerAuthenticationFilter(authenticationManager), SecurityWebFiltersOrder.AUTHENTICATION)
+                .build();
     }
 
 
-    private AuthenticationWebFilter bearerAuthenticationFilter(ReactiveAuthenticationManager authenticationManager) {
+    private AuthenticationWebFilter bearerAuthenticationFilter(AuthenticationManager authenticationManager) {
         AuthenticationWebFilter bearerAuthenticationFilter = new AuthenticationWebFilter(authenticationManager);
         bearerAuthenticationFilter.setServerAuthenticationConverter(new BearerTokenServerAuthenticationConverter(new JwtHandler(secret)));
         bearerAuthenticationFilter.setRequiresAuthenticationMatcher(ServerWebExchangeMatchers.pathMatchers("/**"));
-
         return bearerAuthenticationFilter;
     }
 }

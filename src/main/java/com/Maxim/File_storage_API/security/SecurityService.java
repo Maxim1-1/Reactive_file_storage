@@ -3,7 +3,8 @@ package com.Maxim.File_storage_API.security;
 
 import com.Maxim.File_storage_API.entity.Status;
 import com.Maxim.File_storage_API.entity.UserEntity;
-import com.Maxim.File_storage_API.repository.UserRepository;
+import com.Maxim.File_storage_API.exceptions.security_exeptions.InvalidCredentialsException;
+import com.Maxim.File_storage_API.exceptions.security_exeptions.UserNotAuthenticatedException;
 import com.Maxim.File_storage_API.service.UserService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -12,7 +13,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
-import java.time.Duration;
 import java.util.*;
 
 @Component
@@ -27,8 +27,6 @@ public class SecurityService {
     private Integer expirationInSeconds;
     @Value("${jwt.issuer}")
     private String issuer;
-
-
 
     public SecurityService(UserService userService, PasswordEncoder passwordEncoder) {
         this.userService = userService;
@@ -46,7 +44,6 @@ public class SecurityService {
     private TokenDetails generateToken(Map<String, Object> claims, String subject) {
         Long expirationTimeInMillis = expirationInSeconds * 1000L;
         Date expirationDate = new Date(new Date().getTime() + expirationTimeInMillis);
-
         return generateToken(expirationDate, claims, subject);
     }
 
@@ -67,7 +64,6 @@ public class SecurityService {
         tokenDetails.setToken(token);
         tokenDetails.setIssuedAt(createdDate);
         tokenDetails.setExpiresAt(expirationDate);
-
         return tokenDetails;
     }
 
@@ -75,16 +71,16 @@ public class SecurityService {
         return userService.getUserByUsername(username)
                 .flatMap(user -> {
                     if (user.getStatus().equals(Status.DELETED)) {
-                        return Mono.error(new RuntimeException("User deleted, authenticate is not possible"));
+                        return Mono.error(new UserNotAuthenticatedException("User deleted, authenticate is not possible"));
                     }
                     if (!passwordEncoder.matches(password, user.getPassword())) {
-                        return Mono.error(new RuntimeException("Invalid password"));
+                        return Mono.error(new InvalidCredentialsException("Invalid password"));
                     }
                     TokenDetails tokenDetails = generateToken(user);
                     tokenDetails.setUserId(user.getId());
                     return Mono.just(tokenDetails);
                 })
-                .switchIfEmpty(Mono.error(new RuntimeException("Invalid username")));
+                .switchIfEmpty(Mono.error(new InvalidCredentialsException("Invalid username")));
     }
 
 

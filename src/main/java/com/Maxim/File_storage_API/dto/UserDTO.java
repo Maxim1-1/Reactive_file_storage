@@ -1,6 +1,7 @@
 package com.Maxim.File_storage_API.dto;
 
 import com.Maxim.File_storage_API.entity.Role;
+import com.Maxim.File_storage_API.entity.Status;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -19,7 +20,15 @@ public class UserDTO {
 //    @JsonManagedReference
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private  List<EventDTO> events;
-    private String status;
+    private Status status;
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
 
     public String getPassword() {
         return password;
@@ -37,13 +46,7 @@ public class UserDTO {
         this.role = role;
     }
 
-    public String getStatus() {
-        return status;
-    }
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
 
     public Integer getId() {
         return id;

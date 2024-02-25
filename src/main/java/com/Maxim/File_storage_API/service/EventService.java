@@ -11,26 +11,22 @@ import com.Maxim.File_storage_API.repository.EventRepository;
 import com.Maxim.File_storage_API.repository.FileRepository;
 import com.Maxim.File_storage_API.repository.UserRepository;
 import io.r2dbc.spi.R2dbcDataIntegrityViolationException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
 public class EventService {
+    public EventService(EventRepository eventRepository, FileRepository fileRepository, UserRepository userRepository) {
+        this.eventRepository = eventRepository;
+        this.fileRepository = fileRepository;
+        this.userRepository = userRepository;
+    }
 
-    @Autowired
     private EventRepository eventRepository;
-
-    @Autowired
     private FileRepository fileRepository;
-
-    @Autowired
     private UserRepository userRepository;
 
-
-    public EventService() {
-    }
 
 
     public Mono<EventEntity> getEventById(Integer eventId) {
