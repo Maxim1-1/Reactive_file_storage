@@ -17,7 +17,7 @@ public class JwtHandler {
 
     public Mono<VerificationResult> check(String accessToken) {
         return Mono.just(verify(accessToken))
-                .onErrorResume(e -> Mono.error(new RuntimeException(e.getMessage())));
+                .onErrorResume(e -> Mono.error(new RuntimeException("Uthorization error"+e.getMessage())));
     }
 
     private VerificationResult verify(String token) {

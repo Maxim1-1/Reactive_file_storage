@@ -23,7 +23,7 @@ public class AuthenticationManager implements ReactiveAuthenticationManager {
         CustomPrincipal principal = (CustomPrincipal) authentication.getPrincipal();
         return userService.findUserById(principal.getId())
                 .filter(user -> user.getStatus().equals(Status.ACTIVE.ACTIVE))
-                .switchIfEmpty(Mono.error(new RuntimeException("User deleted")))
+                .switchIfEmpty(Mono.error(new RuntimeException("Authentication is not possible the user has been deleted")))
                 .map(user -> authentication);
     }
 }

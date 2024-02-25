@@ -5,23 +5,22 @@ import com.Maxim.File_storage_API.entity.EventEntity;
 import com.Maxim.File_storage_API.mapper.EventMapper;
 import com.Maxim.File_storage_API.repository.EventRepository;
 import com.Maxim.File_storage_API.service.EventService;
+import io.r2dbc.spi.R2dbcDataIntegrityViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/api/v1/events")
-public class EvenRestControllerV1 {
-//    TODO нужна обрабтка ошибок во всех контроллеров
-
-    public EvenRestControllerV1(EventService eventService, EventMapper eventMapper) {
+public class EventRestControllerV1 {
+    public EventRestControllerV1(EventService eventService, EventMapper eventMapper) {
         this.eventService = eventService;
         this.eventMapper = eventMapper;
     }
-
-    @Autowired
-    private EventRepository eventRepository;
 
     private EventService eventService;
     private EventMapper eventMapper;
@@ -38,11 +37,11 @@ public class EvenRestControllerV1 {
     }
 
 
+
     @PostMapping("")
     public Mono<EventDTO> saveEvents(@RequestBody EventDTO event) {
         return eventService.saveEvents(eventMapper.map(event))
                 .map(eventMapper::map);
-
     }
 
     @PutMapping("/{id}")
@@ -52,8 +51,8 @@ public class EvenRestControllerV1 {
     }
 
     @DeleteMapping("/{id}")
-    public Mono<EventEntity> deleteEventById(@PathVariable Integer id) {
-        return eventService.deleteEventById(id);
+    public Mono<EventDTO> deleteEventById(@PathVariable Integer id) {
+        return eventService.deleteEventById(id).map(eventMapper::map);
     }
 
 

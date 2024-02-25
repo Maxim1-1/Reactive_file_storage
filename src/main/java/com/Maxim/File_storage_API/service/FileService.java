@@ -1,9 +1,9 @@
 package com.Maxim.File_storage_API.service;
 
 
-import com.Maxim.File_storage_API.entity.EventEntity;
 import com.Maxim.File_storage_API.entity.FileEntity;
 import com.Maxim.File_storage_API.entity.Status;
+import com.Maxim.File_storage_API.exceptions.service_exceptions.FileNotExistException;
 import com.Maxim.File_storage_API.repository.EventRepository;
 import com.Maxim.File_storage_API.repository.FileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +11,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDate;
 
 @Service
 public class FileService {
@@ -34,7 +33,14 @@ public class FileService {
     }
 
     public Mono<FileEntity> getFileById(Integer fileId) {
-        return fileRepository.findById(fileId);
+        return fileRepository.existsById(fileId)
+                .flatMap(exists -> {
+                    if (exists) {
+                        return fileRepository.findById(fileId);
+                    } else {
+                        return Mono.error(new FileNotExistException(fileId));
+                    }
+                });
     }
 
     public Flux<FileEntity> getAllFiles() {
@@ -61,24 +67,30 @@ public class FileService {
                                     if (file.getName() != null & file.getName().equalsIgnoreCase(fileRepository.getName())) {
                                         fileRepository.setName(file.getName());
                                     }
-
                                     if (file.getStatus() != null & file.getStatus() != (fileRepository.getStatus())) {
                                         fileRepository.setStatus(file.getStatus());
                                     }
+                                    fileRepository.setUpdatedAt(String.valueOf(LocalDate.now()));
                                     return fileRepository;
                                 })
                                 .flatMap(updatedEvent -> fileRepository.save(updatedEvent));
                     } else {
-                        return Mono.error(new Exception("Event does not exist"));
+                        return Mono.error(new FileNotExistException(file.getId()));
                     }
                 });
     }
 
     public Mono<FileEntity> deleteFileById(Integer id) {
-        return fileRepository.findById(id)
-                .flatMap(fileEntity -> {
-                    fileEntity.setStatus(Status.DELETED);
-                    return fileRepository.save(fileEntity);
+        return fileRepository.existsById(id)
+                .flatMap(exists -> {
+                    if (exists) {
+                        return fileRepository.findById(id).flatMap(file -> {
+                            file.setStatus(Status.DELETED);
+                            return fileRepository.save(file);
+                        });
+                    } else {
+                        return Mono.error(new FileNotExistException(id));
+                    }
                 });
     }
 

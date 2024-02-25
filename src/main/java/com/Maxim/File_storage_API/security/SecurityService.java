@@ -1,6 +1,7 @@
 package com.Maxim.File_storage_API.security;
 
 
+import com.Maxim.File_storage_API.entity.Status;
 import com.Maxim.File_storage_API.entity.UserEntity;
 import com.Maxim.File_storage_API.repository.UserRepository;
 import com.Maxim.File_storage_API.service.UserService;
@@ -73,15 +74,17 @@ public class SecurityService {
     public Mono<TokenDetails> authenticate(String username, String password) {
         return userService.getUserByUsername(username)
                 .flatMap(user -> {
-                    if (!passwordEncoder.matches(password, user.getPassword())) {
-                        return Mono.error(new RuntimeException());
+                    if (user.getStatus().equals(Status.DELETED)) {
+                        return Mono.error(new RuntimeException("User deleted, authenticate is not possible"));
                     }
-
+                    if (!passwordEncoder.matches(password, user.getPassword())) {
+                        return Mono.error(new RuntimeException("Invalid password"));
+                    }
                     TokenDetails tokenDetails = generateToken(user);
                     tokenDetails.setUserId(user.getId());
                     return Mono.just(tokenDetails);
                 })
-                .switchIfEmpty(Mono.error(new RuntimeException()));
+                .switchIfEmpty(Mono.error(new RuntimeException("Invalid username")));
     }
 
 
