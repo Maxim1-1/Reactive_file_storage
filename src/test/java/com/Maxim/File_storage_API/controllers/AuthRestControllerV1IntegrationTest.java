@@ -47,9 +47,6 @@ public class AuthRestControllerV1IntegrationTest {
     private UserMapper userMapper;
 
     @Test
-//    @WithMockUser(username="testUser",roles="USER")
-//    positive200
-//    TODO добавить тест на валидацию необходимых параметров и кастомный exeption
     public void testRegisterUserForUnauthenticatedUserReturn200() {
         UserDTO userDTO = new UserDTO();
         userDTO.setName("testUser");
