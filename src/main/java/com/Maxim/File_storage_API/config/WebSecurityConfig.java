@@ -27,19 +27,17 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http, AuthenticationManager authenticationManager)  {
-
         return http.csrf(csrf -> csrf.disable())
                 .authorizeExchange(authorize -> authorize
-                        .pathMatchers(HttpMethod.GET,"/api/v1/events*").hasAnyAuthority("ADMIN", "MODERATOR")
-                        .pathMatchers(HttpMethod.GET,"/api/v1/events/*").hasAnyAuthority("ADMIN", "MODERATOR")
+                        .pathMatchers("/api/v1/events/*").hasAnyAuthority("ADMIN", "MODERATOR")
                         .pathMatchers(HttpMethod.PUT, "/api/v1/files/*").hasAnyAuthority("ADMIN", "MODERATOR")
-                        .pathMatchers(HttpMethod.PUT, "/api/v1/files*").hasAnyAuthority("ADMIN", "MODERATOR")
+                        .pathMatchers(HttpMethod.PUT, "/api/v1/files").hasAnyAuthority("ADMIN", "MODERATOR")
                         .pathMatchers(HttpMethod.DELETE, "/api/v1/files").hasAnyAuthority("ADMIN", "MODERATOR")
                         .pathMatchers(HttpMethod.DELETE, "/api/v1/files/*").hasAnyAuthority("ADMIN", "MODERATOR")
                         .pathMatchers(HttpMethod.GET, "/api/v1/users/*").hasAnyAuthority("MODERATOR")
                         .pathMatchers(HttpMethod.GET, "/api/v1/users").hasAnyAuthority("MODERATOR")
                         .pathMatchers("/api/v1/users/*").hasAnyAuthority("ADMIN")
-                        .pathMatchers("/api/v1/auth/register", "/api/v1/auth/login")
+                        .pathMatchers("/api/v1/auth/register", "/api/v1/auth/login","/api/v1/auth/test")
                         .permitAll()
                         .anyExchange().authenticated()
                 )
