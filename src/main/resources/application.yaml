@@ -8,6 +8,14 @@ spring:
     url: ${R2DBC_URL}
     username: ${R2DBC_USER}
     password: ${R2DBC_PASSWORD}
+  flyway:
+    locations: classpath:db/migration
+    url: jdbc:mysql://localhost:3306/rest
+    schemas: rest
+    defaultSchema: rest
+    user: root
+    password: Addy@789**$
+    baseline-on-migrate: true
 
 s3:
   urlStorage: ${S3_URL}
@@ -21,8 +29,7 @@ jwt:
   iteration_encoder: ${ITERATION_ENCODER}
   keylength_encoder: ${KEYLENGTH_ENCODER}
   secret: ${JWT_SECRET}
-  expiration: ${3600}
+  expiration: ${EXPIRATION}
   issuer: ${ISSUER}
 
-flyway:
 
