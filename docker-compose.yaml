@@ -3,8 +3,8 @@ version: '3'
 services:
   file-storage:
     image: file_storage
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    ports:
+      - 8080
     build:
       context: .
       dockerfile: Dockerfile
@@ -28,6 +28,8 @@ services:
       - ISSUER=Maxim
   mysql_db:
     image: mysql:latest
+    ports:
+      - 3306
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
