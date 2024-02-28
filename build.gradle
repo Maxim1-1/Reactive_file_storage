@@ -8,7 +8,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version "$springBootVersion"
 	id 'io.spring.dependency-management' version "$springDependencyManagementVersion"
-//	id "org.flywaydb.flyway" version "10.8.1"
+
 }
 
 group = 'com.Maxim'
@@ -45,20 +45,7 @@ dependencies {
 	implementation 'org.flywaydb:flyway-mysql'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 
-//	implementation 'mysql:mysql-connector-java:8.0.23'
-
-//	implementation 'org.flywaydb:flyway-mysql:8.4.4'
-//	implementation 'org.flywaydb:flyway-core:8.4.4'
-
-//	implementation group: 'org.flywaydb', name: 'flyway-mysql', version: '8.5.13'
-//	implementation group: 'org.flywaydb', name: 'flyway-core', version: '10.8.1'
 }
-
-//flyway {
-//	url = 'jdbc:mysql://localhost:3306/rest'
-//	user = 'root'
-//	password = 'Addy@789**$'
-//}
 
 tasks.named('test') {
 	useJUnitPlatform()
