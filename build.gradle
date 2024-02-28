@@ -41,13 +41,17 @@ dependencies {
 	implementation("software.amazon.awssdk:s3:$awsS3Version")
 	implementation "io.asyncer:r2dbc-mysql:$r2dbcMySQLVersion"
 
-	implementation 'mysql:mysql-connector-java:8.0.23'
+	implementation 'org.flywaydb:flyway-core'
+	implementation 'org.flywaydb:flyway-mysql'
+	runtimeOnly 'com.mysql:mysql-connector-j'
+
+//	implementation 'mysql:mysql-connector-java:8.0.23'
 
 //	implementation 'org.flywaydb:flyway-mysql:8.4.4'
 //	implementation 'org.flywaydb:flyway-core:8.4.4'
 
-	implementation group: 'org.flywaydb', name: 'flyway-mysql', version: '8.5.13'
-	implementation group: 'org.flywaydb', name: 'flyway-core', version: '10.8.1'
+//	implementation group: 'org.flywaydb', name: 'flyway-mysql', version: '8.5.13'
+//	implementation group: 'org.flywaydb', name: 'flyway-core', version: '10.8.1'
 }
 
 //flyway {

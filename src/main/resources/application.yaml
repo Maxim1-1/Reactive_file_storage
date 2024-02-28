@@ -10,11 +10,11 @@ spring:
     password: ${R2DBC_PASSWORD}
   flyway:
     locations: classpath:db/migration
-    url: jdbc:mysql://localhost:3306/rest
+    url: ${DB_URL}
     schemas: rest
     defaultSchema: rest
-    user: root
-    password: Addy@789**$
+    user: ${R2DBC_USER}
+    password: ${R2DBC_PASSWORD}
     baseline-on-migrate: true
 
 s3:

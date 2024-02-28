@@ -5,14 +5,14 @@ spring:
   r2dbc:
     url: r2dbc:mysql://localhost:3306/rest
     username: root
-    password: root
+    password: Addy@789**$
 
 s3:
   urlStorage: https://storage.yandexcloud.net
   region: ru-central1
   bucket: files-strorage-repository
-  ACCESS_KEY:
-  SECRET_KEY:
+  ACCESS_KEY: YCAJEdF9IdEqVsReNMqELKFlm
+  SECRET_KEY: YCOZmkW-e355olhFFzH5j9LGXtxwCCDxtRSuGSTc
 
 jwt:
   secret_encoder: FZK2DZ82odqS13e8aENggaMbb_fAkl-nJL4AEVBX43g
