@@ -11,8 +11,8 @@ s3:
   urlStorage: https://storage.yandexcloud.net
   region: ru-central1
   bucket: files-strorage-repository
-  ACCESS_KEY: YCAJEdF9IdEqVsReNMqELKFlm
-  SECRET_KEY: YCOZmkW-e355olhFFzH5j9LGXtxwCCDxtRSuGSTc
+  ACCESS_KEY:
+  SECRET_KEY:
 
 jwt:
   secret_encoder: FZK2DZ82odqS13e8aENggaMbb_fAkl-nJL4AEVBX43g
