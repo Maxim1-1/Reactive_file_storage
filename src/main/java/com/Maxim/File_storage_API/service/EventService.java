@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 @Service
 public class EventService {
     public EventService(EventRepository eventRepository, FileRepository fileRepository, UserRepository userRepository) {
@@ -23,37 +25,36 @@ public class EventService {
         this.userRepository = userRepository;
     }
 
-    private EventRepository eventRepository;
-    private FileRepository fileRepository;
-    private UserRepository userRepository;
-
+    private final EventRepository eventRepository;
+    private final FileRepository fileRepository;
+    private final UserRepository userRepository;
 
 
     public Mono<EventEntity> getEventById(Integer eventId) {
-        return eventRepository.existsById(eventId)
-                .flatMap(exists -> {
-                    if (exists) {
-                        return eventRepository.findById(eventId);
-                    } else {
-                        return Mono.error(new EventNotExistException(eventId));
-                    }
-                });
+        return eventRepository.findById(eventId).switchIfEmpty(Mono.error(new EventNotExistException(eventId)));
     }
 
     public Flux<EventEntity> getAllEvents() {
         return eventRepository.findAll();
     }
 
-    public Mono<EventEntity> saveEvents(EventEntity event) throws R2dbcDataIntegrityViolationException {
-        Mono<Boolean> userExists = userRepository.existsById(event.getUserId());
-        Mono<Boolean> fileExists = fileRepository.existsById(event.getFileId());
-        return Mono.zip(userExists, fileExists)
+    public Mono<List<EventEntity>> findAllByUserID (Integer id) {
+        return eventRepository.findAllByUserId(id).collectList();
+    }
+
+    public Mono<EventEntity> saveEvents(EventEntity event) {
+        return Mono.zip(
+                        userRepository.existsById(event.getUserId()),
+                        fileRepository.existsById(event.getFileId())
+                )
                 .flatMap(tuple -> {
-                    if (!tuple.getT1() && !tuple.getT2()) {
+                    boolean userExists = tuple.getT1();
+                    boolean fileExists = tuple.getT2();
+                    if (!userExists && !fileExists) {
                         return Mono.error(new UserAndFilesNotExistException(event.getUserId(), event.getFileId()));
-                    } else if (!tuple.getT1()) {
+                    } else if (!userExists) {
                         return Mono.error(new UserNotExistException(event.getUserId()));
-                    } else if (!tuple.getT2()) {
+                    } else if (!fileExists) {
                         return Mono.error(new FileNotExistException(event.getFileId()));
                     } else {
                         event.setStatus(Status.ACTIVE);
@@ -63,44 +64,31 @@ public class EventService {
                 .switchIfEmpty(Mono.error(new Exception("Bad Request")));
     }
 
+
     public Mono<EventEntity> updateEventById(EventEntity event, Integer eventId) {
-        return eventRepository.existsById(eventId)
-                .flatMap(exists -> {
-                    if (exists) {
-                        event.setId(eventId);
-                        return eventRepository.findById(eventId)
-                                .map(eventRepository -> {
-                                    if (event.getFileId() != null & event.getFileId() != (eventRepository.getFileId())) {
-                                        eventRepository.setFileId(event.getFileId());
-                                    }
-                                    if (event.getUserId() != null & event.getUserId() != (eventRepository.getUserId())) {
-                                        eventRepository.setUserId(event.getUserId());
-                                    }
-                                    if (event.getStatus() != null & event.getStatus() != (eventRepository.getStatus())) {
-                                        eventRepository.setStatus(event.getStatus());
-                                    }
-                                    return eventRepository;
-                                })
-                                .flatMap(updatedEvent -> eventRepository.save(updatedEvent));
-                    } else {
-                        return Mono.error(new EventNotExistException(eventId));
+        event.setId(eventId);
+        return eventRepository.findById(eventId)
+                .flatMap(existEvent -> {
+                    if (event.getFileId() != null && event.getFileId() != (existEvent.getFileId())) {
+                        existEvent.setFileId(event.getFileId());
                     }
-                });
+                    if (event.getUserId() != null && event.getUserId() != (existEvent.getUserId())) {
+                        existEvent.setUserId(event.getUserId());
+                    }
+                    if (event.getStatus() != null && event.getStatus() != (existEvent.getStatus())) {
+                        existEvent.setStatus(event.getStatus());
+                    }
+                    return eventRepository.save(existEvent);
+
+                }).switchIfEmpty(Mono.error(new EventNotExistException(eventId)));
     }
 
 
     public Mono<EventEntity> deleteEventById(Integer eventId) {
-        return eventRepository.existsById(eventId)
-                .flatMap(exists -> {
-                    if (exists) {
-                        return eventRepository.findById(eventId).flatMap(fileEntity -> {
-                            fileEntity.setStatus(Status.DELETED);
-                            return eventRepository.save(fileEntity);
-                        });
-                    } else {
-                        return Mono.error(new EventNotExistException(eventId));
-                    }
-                });
+        return eventRepository.findById(eventId).flatMap(fileEntity -> {
+            fileEntity.setStatus(Status.DELETED);
+            return eventRepository.save(fileEntity);
+        }).switchIfEmpty(Mono.error(new EventNotExistException(eventId)));
     }
 
 

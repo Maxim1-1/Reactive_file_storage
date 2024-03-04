@@ -64,7 +64,7 @@ class FileServiceUnitTest {
     @Test
     public void testFindFileById_NonExistingFile() {
         Integer userId = 1;
-        when(fileRepository.existsById(userId)).thenReturn(Mono.just(false));
+        when(fileRepository.findById(userId)).thenReturn(Mono.empty());
         Mono<FileEntity> result = fileService.getFileById(userId);
         result.subscribe(
                 userEntity -> {
@@ -76,7 +76,7 @@ class FileServiceUnitTest {
                     assertEquals(userId, userNotExistException.getId());
                 }
         );
-        Mockito.verify(fileRepository).existsById(userId);
+        Mockito.verify(fileRepository).findById(userId);
     }
 
     @Test
@@ -147,7 +147,7 @@ class FileServiceUnitTest {
         file.setName("test");
         file.setStatus(Status.ACTIVE);
 
-        when(fileRepository.existsById(fileId)).thenReturn(Mono.just(false));
+        when(fileRepository.findById(fileId)).thenReturn(Mono.empty());
         Mono<FileEntity> result = fileService.updateFileById(file,fileId);
 
         StepVerifier.create(result)
@@ -180,7 +180,7 @@ class FileServiceUnitTest {
     @Test
     void deleteFileById_NonExistingUser() {
         Integer fileId = 1;
-        when(fileRepository.existsById(fileId)).thenReturn(Mono.just(false));
+        when(fileRepository.findById(fileId)).thenReturn(Mono.empty());
         Mono<FileEntity> result = fileService.deleteFileById(fileId);
 
         StepVerifier.create(result)

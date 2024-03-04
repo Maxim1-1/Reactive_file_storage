@@ -1,5 +1,6 @@
 package com.Maxim.File_storage_API.service;
 
+import com.Maxim.File_storage_API.entity.EventEntity;
 import com.Maxim.File_storage_API.entity.Role;
 import com.Maxim.File_storage_API.entity.Status;
 import com.Maxim.File_storage_API.entity.UserEntity;
@@ -15,6 +16,9 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -27,6 +31,9 @@ class UserServiceUnitTest {
 
     @Mock
     UserRepository userRepository;
+
+    @Mock
+    EventService eventService;
 
     @InjectMocks
     UserService userService;
@@ -89,7 +96,13 @@ class UserServiceUnitTest {
         userEntity.setRole(Role.USER);
         userEntity.setStatus(Status.ACTIVE);
 
-        when(userRepository.existsById(userId)).thenReturn(Mono.just(true));
+        List<EventEntity> events = new ArrayList<>();
+        EventEntity event = new EventEntity();
+
+        events.add(event);
+
+
+        when(eventService.findAllByUserID(userId)).thenReturn(Mono.just(events));
         when(userRepository.findById(userId)).thenReturn(Mono.just(userEntity));
 
         Mono<UserEntity> result = userService.findUserById(userId);
@@ -102,7 +115,12 @@ class UserServiceUnitTest {
     @Test
     public void testFindUserById_NonExistingUser() {
         Integer userId = 1;
-        when(userRepository.existsById(userId)).thenReturn(Mono.just(false));
+        List<EventEntity> events = new ArrayList<>();
+        EventEntity event = new EventEntity();
+        events.add(event);
+
+        when(eventService.findAllByUserID(userId)).thenReturn(Mono.just(events));
+        when(userRepository.findById(userId)).thenReturn(Mono.empty());
 
         Mono<UserEntity> result = userService.findUserById(userId);
 
@@ -116,7 +134,8 @@ class UserServiceUnitTest {
                     assertEquals(userId, userNotExistException.getId());
                 }
         );
-        Mockito.verify(userRepository).existsById(userId);
+        Mockito.verify(userRepository).findById(userId);
+        Mockito.verify(eventService).findAllByUserID(userId);
     }
 
     @Test
@@ -180,7 +199,7 @@ class UserServiceUnitTest {
         user.setName("test");
         user.setStatus(Status.ACTIVE);
 
-        when(userRepository.existsById(userId)).thenReturn(Mono.just(false));
+        when(userRepository.findById(userId)).thenReturn(Mono.empty());
         Mono<UserEntity> result = userService.updateUserById(user,userId);
 
         StepVerifier.create(result)
@@ -215,7 +234,7 @@ class UserServiceUnitTest {
     @Test
     void deleteUserById_NonExistingUser() {
         Integer userId = 1;
-        when(userRepository.existsById(userId)).thenReturn(Mono.just(false));
+        when(userRepository.findById(userId)).thenReturn(Mono.empty());
         Mono<UserEntity> result = userService.deleteUserById(userId);
 
         StepVerifier.create(result)

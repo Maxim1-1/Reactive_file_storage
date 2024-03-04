@@ -1,4 +1,4 @@
-package com.Maxim.File_storage_API;
+package com.Maxim.File_storage_API.config;
 
 import io.asyncer.r2dbc.mysql.MySqlConnectionFactoryProvider;
 import org.springframework.boot.autoconfigure.r2dbc.ConnectionFactoryOptionsBuilderCustomizer;

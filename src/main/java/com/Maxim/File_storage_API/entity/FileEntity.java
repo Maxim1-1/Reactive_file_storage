@@ -2,10 +2,13 @@ package com.Maxim.File_storage_API.entity;
 
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.util.Objects;
+
 @Table(name = "files")
-public class FileEntity {
+public class FileEntity implements Persistable<Integer> {
 
     @Id
     private Integer id;
@@ -17,6 +20,12 @@ public class FileEntity {
     private String updatedAt;
 
     private Status status;
+
+
+    @Override
+    public boolean isNew(){
+        return Objects.isNull(this.id);
+    }
 
     public Status getStatus() {
         return status;

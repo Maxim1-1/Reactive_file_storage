@@ -19,23 +19,23 @@ import java.util.Collection;
 @Service
 public class FileUserService {
 
-    public FileUserService(FileService fileService, EventService eventService, EventRepository eventRepository, UserService userService, S3RepositoryImpl s3) {
+    public FileUserService(FileService fileService, EventService eventService, EventRepository eventRepository, UserService userService, S3RepositoryImpl s3Async) {
         this.fileService = fileService;
         this.eventService = eventService;
         this.eventRepository = eventRepository;
         this.userService = userService;
-        this.s3 = s3;
+        this.s3Async = s3Async;
     }
 
-    private FileService fileService;
+    private final FileService fileService;
 
-    private EventService eventService;
+    private final EventService eventService;
 
-    private UserService userService;
+    private final UserService userService;
 
-    private EventRepository eventRepository;
+    private final EventRepository eventRepository;
 
-    private S3RepositoryImpl s3;
+    private final S3RepositoryImpl s3Async;
 
     @Value("${s3.bucket}")
     private String bucket;
@@ -71,7 +71,7 @@ public class FileUserService {
 
     public Mono<FileEntity> saveFile(Mono<FilePart> file, Integer userId) {
         return file.flatMap(f -> {
-            return s3.uploadFile(Mono.just(f), bucket, f.filename())
+            return s3Async.uploadFile(Mono.just(f), bucket, f.filename())
                     .flatMap(filePath -> {
                         FileEntity fileEntity = new FileEntity();
                         fileEntity.setFilePath(filePath);

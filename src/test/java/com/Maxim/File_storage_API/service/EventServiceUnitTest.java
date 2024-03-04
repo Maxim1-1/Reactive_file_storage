@@ -20,6 +20,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -57,7 +58,6 @@ class EventServiceUnitTest {
         eventEntity.setId(eventId);
         eventEntity.setStatus(Status.ACTIVE);
 
-        when(eventRepository.existsById(eventId)).thenReturn(Mono.just(true));
         when(eventRepository.findById(eventId)).thenReturn(Mono.just(eventEntity));
 
         Mono<EventEntity> result = eventService.getEventById(eventId);
@@ -68,13 +68,13 @@ class EventServiceUnitTest {
     }
 
     @Test
-    public void testFindEventById_NonExistingFile() {
+    public void testFindEventById_NonExistingEvent() {
         Integer eventId = 1;
-        when(eventRepository.existsById(eventId)).thenReturn(Mono.just(false));
+        when(eventRepository.findById(eventId)).thenReturn(Mono.empty());
         Mono<EventEntity> result = eventService.getEventById(eventId);
         result.subscribe(
                 eventEntity -> {
-                    assertEquals(null, eventEntity);
+                    assertNull(eventEntity);
                 },
                 error -> {
                     assertEquals("EventNotExistException", error.getClass().getSimpleName());
@@ -82,7 +82,7 @@ class EventServiceUnitTest {
                     assertEquals(eventId, eventNotExistException.getId());
                 }
         );
-        Mockito.verify(eventRepository).existsById(eventId);
+        Mockito.verify(eventRepository).findById(eventId);
     }
 
     @Test
@@ -192,14 +192,16 @@ class EventServiceUnitTest {
                 .verifyComplete();
     }
 
+
     @Test
     void updateEventById_NonExistingUser() {
         Integer eventId = 1;
         EventEntity event = new EventEntity();
-        event.setId(1);
+        event.setId(eventId);
         event.setStatus(Status.ACTIVE);
 
-        when(eventRepository.existsById(eventId)).thenReturn(Mono.just(false));
+        when(eventRepository.findById(eventId)).thenReturn(Mono.empty());
+
         Mono<EventEntity> result = eventService.updateEventById(event, eventId);
 
         StepVerifier.create(result)
@@ -220,7 +222,7 @@ class EventServiceUnitTest {
         expectedEvent.setId(eventId);
         expectedEvent.setStatus(Status.DELETED);
 
-        when(eventRepository.existsById(eventId)).thenReturn(Mono.just(true));
+        when(eventRepository.existsById(eventId)).thenReturn(Mono.empty());
         when(eventRepository.findById(eventId)).thenReturn(Mono.just(event));
         when(eventRepository.save(event)).thenReturn(Mono.just(expectedEvent));
 
@@ -233,11 +235,12 @@ class EventServiceUnitTest {
     @Test
     void deleteEventById_NonExistingUser() {
         Integer eventId = 1;
-        when(eventRepository.existsById(eventId)).thenReturn(Mono.just(false));
+        when(eventRepository.findById(eventId)).thenReturn(Mono.empty());
         Mono<EventEntity> result = eventService.deleteEventById(eventId);
 
         StepVerifier.create(result)
                 .expectError(EventNotExistException.class)
                 .verify();
     }
+
 }

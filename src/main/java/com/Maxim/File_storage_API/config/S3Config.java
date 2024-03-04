@@ -8,6 +8,8 @@ import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 
+import software.amazon.awssdk.services.s3.S3AsyncClient;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -34,6 +36,19 @@ public class S3Config {
                     .credentialsProvider(StaticCredentialsProvider.create(credentials))
                     .build();
             return s3;
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    @Bean
+    public S3AsyncClient getAsyncClient(AwsBasicCredentials credentials) {
+        try {
+            S3AsyncClient client = S3AsyncClient.builder()
+                    .region(Region.of(region))
+                    .endpointOverride(new URI(endpointUrl))
+                    .credentialsProvider(StaticCredentialsProvider.create(credentials))
+                    .build();
+            return client;
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }

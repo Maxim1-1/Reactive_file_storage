@@ -5,35 +5,31 @@ import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.core.async.AsyncRequestBody;
+import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.S3Exception;
 
 
 @Component
 public class S3RepositoryImpl {
-    public S3RepositoryImpl(S3Client s3) {
-        this.s3 = s3;
-    }
+    private  S3AsyncClient s3Async;
 
-    private S3Client s3;
+    public S3RepositoryImpl(S3AsyncClient s3Async) {
+        this.s3Async = s3Async;
+    }
 
     public Mono<String> uploadFile(Mono<FilePart> filePartMono, String bucketName, String fileName) {
         return convertFilePartToByteArray(filePartMono)
                 .flatMap(fileBytes -> {
-                    PutObjectRequest putOb = PutObjectRequest.builder()
+                    PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                             .bucket(bucketName)
                             .key(fileName)
                             .build();
-                    return Mono.fromCallable(() -> {
-                        s3.putObject(putOb, RequestBody.fromBytes(fileBytes));
-                        return bucketName + "/" + fileName;
-                    });
+                    return Mono.fromCompletionStage(s3Async.putObject(putObjectRequest, AsyncRequestBody.fromBytes(fileBytes)))
+                            .thenReturn(bucketName + "/" + fileName);
                 })
-                .onErrorMap(S3Exception.class, e -> {
-                    System.err.println(e.awsErrorDetails().errorMessage());
-                    return e;
+                .doOnError(e -> {
+                    System.err.println("Error uploading file to S3: " + e.getMessage());
                 });
     }
 
@@ -47,6 +43,9 @@ public class S3RepositoryImpl {
                             return bytes;
                         }));
     }
-
 }
+
+
+
+
 

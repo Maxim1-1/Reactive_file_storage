@@ -3,6 +3,7 @@ package com.Maxim.File_storage_API.service;
 
 import com.Maxim.File_storage_API.entity.FileEntity;
 import com.Maxim.File_storage_API.entity.Status;
+import com.Maxim.File_storage_API.exceptions.service_exceptions.EventNotExistException;
 import com.Maxim.File_storage_API.exceptions.service_exceptions.FileNotExistException;
 import com.Maxim.File_storage_API.repository.EventRepository;
 import com.Maxim.File_storage_API.repository.FileRepository;
@@ -21,9 +22,9 @@ public class FileService {
         this.eventRepository = eventRepository;
     }
 
-    private FileRepository fileRepository;
+    private final FileRepository fileRepository;
 
-    private EventRepository eventRepository;
+    private final EventRepository eventRepository;
 
     public Flux<FileEntity> getFilesByUserId(Integer userId) {
         return eventRepository.findAllByUserId(userId)
@@ -36,14 +37,7 @@ public class FileService {
     }
 
     public Mono<FileEntity> getFileById(Integer fileId) {
-        return fileRepository.existsById(fileId)
-                .flatMap(exists -> {
-                    if (exists) {
-                        return fileRepository.findById(fileId);
-                    } else {
-                        return Mono.error(new FileNotExistException(fileId));
-                    }
-                });
+        return fileRepository.findById(fileId).switchIfEmpty(Mono.error(new FileNotExistException(fileId)));
     }
 
     public Flux<FileEntity> getAllFiles() {
@@ -52,49 +46,38 @@ public class FileService {
 
 
     public Mono<FileEntity> updateFileById(FileEntity file, Integer fileId) {
-        return fileRepository.existsById(fileId)
-                .flatMap(exists -> {
-                    if (exists) {
-                        file.setId(fileId);
-                        return fileRepository.findById(fileId)
-                                .map(fileRepository -> {
-                                    if (file.getFilePath() != null & file.getFilePath().equalsIgnoreCase(fileRepository.getFilePath())) {
-                                        fileRepository.setFilePath(file.getFilePath());
-                                    }
-                                    if (file.getUpdatedAt() != null & file.getUpdatedAt().equalsIgnoreCase(fileRepository.getUpdatedAt())) {
-                                        fileRepository.setUpdatedAt(file.getUpdatedAt());
-                                    }
-                                    if (file.getCreateAt() != null & file.getCreateAt().equalsIgnoreCase(fileRepository.getCreateAt())) {
-                                        fileRepository.setCreateAt(file.getCreateAt());
-                                    }
-                                    if (file.getName() != null & file.getName().equalsIgnoreCase(fileRepository.getName())) {
-                                        fileRepository.setName(file.getName());
-                                    }
-                                    if (file.getStatus() != null & file.getStatus() != (fileRepository.getStatus())) {
-                                        fileRepository.setStatus(file.getStatus());
-                                    }
-                                    fileRepository.setUpdatedAt(String.valueOf(LocalDate.now()));
-                                    return fileRepository;
-                                })
-                                .flatMap(updatedEvent -> fileRepository.save(updatedEvent));
-                    } else {
-                        return Mono.error(new FileNotExistException(file.getId()));
+        file.setId(fileId);
+        return fileRepository.findById(fileId)
+                .flatMap(existFile -> {
+                    if (file.getFilePath() != null & file.getFilePath().equalsIgnoreCase(existFile.getFilePath())) {
+                        existFile.setFilePath(file.getFilePath());
                     }
-                });
+                    if (file.getUpdatedAt() != null & file.getUpdatedAt().equalsIgnoreCase(existFile.getUpdatedAt())) {
+                        existFile.setUpdatedAt(file.getUpdatedAt());
+                    }
+                    if (file.getCreateAt() != null & file.getCreateAt().equalsIgnoreCase(existFile.getCreateAt())) {
+                        existFile.setCreateAt(file.getCreateAt());
+                    }
+                    if (file.getName() != null & file.getName().equalsIgnoreCase(existFile.getName())) {
+                        existFile.setName(file.getName());
+                    }
+                    if (file.getStatus() != null & file.getStatus() != (existFile.getStatus())) {
+                        existFile.setStatus(file.getStatus());
+                    }
+                    existFile.setUpdatedAt(String.valueOf(LocalDate.now()));
+                    return fileRepository.save(existFile);
+                })
+                .switchIfEmpty(Mono.error(new FileNotExistException(fileId)));
+
+
     }
 
     public Mono<FileEntity> deleteFileById(Integer id) {
-        return fileRepository.existsById(id)
-                .flatMap(exists -> {
-                    if (exists) {
-                        return fileRepository.findById(id).flatMap(file -> {
-                            file.setStatus(Status.DELETED);
-                            return fileRepository.save(file);
-                        });
-                    } else {
-                        return Mono.error(new FileNotExistException(id));
-                    }
-                });
+        return fileRepository.findById(id).flatMap(file -> {
+            file.setStatus(Status.DELETED);
+            return fileRepository.save(file);
+        }).switchIfEmpty(Mono.error(new FileNotExistException(id)));
+
     }
 
 }

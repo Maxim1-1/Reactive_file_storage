@@ -4,13 +4,15 @@ package com.Maxim.File_storage_API.entity;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.util.List;
+import java.util.Objects;
 
 
 @Table(name = "user")
-public class UserEntity {
+public class UserEntity implements Persistable<Integer> {
 
     @Id
     private Integer id;
@@ -20,6 +22,12 @@ public class UserEntity {
     private Status status;
     @Transient
     private  List<EventEntity> events;
+
+    @Override
+    public boolean isNew(){
+        return Objects.isNull(this.id);
+    }
+
     public UserEntity() {
 
     }
