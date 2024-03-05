@@ -29,17 +29,26 @@ public class WebSecurityConfig {
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http, AuthenticationManager authenticationManager)  {
         return http.csrf(csrf -> csrf.disable())
                 .authorizeExchange(authorize -> authorize
-                        .pathMatchers("/api/v1/events/*").hasAnyAuthority("ADMIN", "MODERATOR")
-                        .pathMatchers(HttpMethod.PUT, "/api/v1/files/*").hasAnyAuthority("ADMIN", "MODERATOR")
-                        .pathMatchers(HttpMethod.PUT, "/api/v1/files").hasAnyAuthority("ADMIN", "MODERATOR")
-                        .pathMatchers(HttpMethod.DELETE, "/api/v1/files").hasAnyAuthority("ADMIN", "MODERATOR")
-                        .pathMatchers(HttpMethod.DELETE, "/api/v1/files/*").hasAnyAuthority("ADMIN", "MODERATOR")
-                        .pathMatchers(HttpMethod.GET, "/api/v1/users/*").hasAnyAuthority("MODERATOR")
-                        .pathMatchers(HttpMethod.GET, "/api/v1/users").hasAnyAuthority("MODERATOR")
-                        .pathMatchers("/api/v1/users/*").hasAnyAuthority("ADMIN")
-                        .pathMatchers("/api/v1/auth/register", "/api/v1/auth/login","/api/v1/auth/test")
-                        .permitAll()
-                        .anyExchange().authenticated()
+                                .pathMatchers(HttpMethod.GET, "/api/v1/users/*").hasAnyAuthority("MODERATOR","ADMIN")
+                                .pathMatchers(HttpMethod.GET, "/api/v1/users").hasAnyAuthority("MODERATOR","ADMIN")
+                                .pathMatchers(HttpMethod.POST, "/api/v1/users").hasAnyAuthority("ADMIN")
+                                .pathMatchers(HttpMethod.PUT, "/api/v1/users/*").hasAnyAuthority("ADMIN")
+                                .pathMatchers(HttpMethod.DELETE, "/api/v1/users/*").hasAnyAuthority("ADMIN")
+
+                                .pathMatchers(HttpMethod.GET, "/api/v1/events/*").hasAnyAuthority("MODERATOR","ADMIN")
+                                .pathMatchers(HttpMethod.GET, "/api/v1/events").hasAnyAuthority("MODERATOR","ADMIN")
+                                .pathMatchers(HttpMethod.POST, "/api/v1/events").hasAnyAuthority("MODERATOR","ADMIN")
+                                .pathMatchers(HttpMethod.PUT, "/api/v1/events/*").hasAnyAuthority("MODERATOR","ADMIN")
+                                .pathMatchers(HttpMethod.DELETE, "/api/v1/events/*").hasAnyAuthority("MODERATOR","ADMIN")
+
+                                .pathMatchers(HttpMethod.GET, "/api/v1/files/*").hasAnyAuthority("MODERATOR","ADMIN")
+                                .pathMatchers(HttpMethod.GET, "/api/v1/files").hasAnyAuthority("MODERATOR","ADMIN")
+                                .pathMatchers(HttpMethod.POST, "/api/v1/files").hasAnyAuthority("MODERATOR","ADMIN")
+                                .pathMatchers(HttpMethod.PUT, "/api/v1/files/*").hasAnyAuthority("MODERATOR","ADMIN")
+                                .pathMatchers(HttpMethod.DELETE, "/api/v1/files/*").hasAnyAuthority("MODERATOR","ADMIN")
+
+                                .pathMatchers("/api/v1/auth/register", "/api/v1/auth/login").permitAll()
+                                .pathMatchers("/api/**").hasAnyAuthority("ADMIN")
                 )
                 .addFilterAfter(bearerAuthenticationFilter(authenticationManager), SecurityWebFiltersOrder.AUTHENTICATION)
                 .build();

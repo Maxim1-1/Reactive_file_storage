@@ -34,7 +34,6 @@ public class AuthRestControllerV1 {
 
     @PostMapping("/login")
     public Mono<AuthResponseDto> login(@RequestBody AuthRequestDto dto) {
-
         return securityService.authenticate(dto.getName(), dto.getPassword())
                 .flatMap(tokenDetails -> {
                     AuthResponseDto response = new AuthResponseDto();

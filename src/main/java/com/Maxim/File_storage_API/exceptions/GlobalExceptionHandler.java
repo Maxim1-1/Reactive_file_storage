@@ -33,7 +33,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<AuthenticationError> notAuthenticated (UserNotAuthenticatedException e) {
-        return new ResponseEntity<>(new AuthenticationError(e.getMessage()), HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(new AuthenticationError(e.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
 }

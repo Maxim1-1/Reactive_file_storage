@@ -57,6 +57,7 @@ public class UserService {
 
 
     public Mono<UserEntity> saveUser(UserEntity user) {
+        user.setStatus(Status.ACTIVE);
         return userRepository.save(user);
     }
 
@@ -70,6 +71,10 @@ public class UserService {
 
                     if (updatedUser.getStatus() != null && updatedUser.getStatus() != (user.getStatus())) {
                         user.setStatus(updatedUser.getStatus());
+                    }
+
+                    if (updatedUser.getRole() != null && updatedUser.getRole() != (user.getRole())) {
+                        user.setRole(updatedUser.getRole());
                     }
                     return userRepository.save(user);
                 }).switchIfEmpty(Mono.error(new UserNotExistException(id)));
