@@ -1,5 +1,6 @@
 package com.Maxim.File_storage_API.dto;
 
+import com.Maxim.File_storage_API.entity.Status;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -13,7 +14,7 @@ public class EventDTO {
 
     private Integer userId ;
     private Integer fileId ;
-    private String status;
+    private Status status;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private UserDTO user;
@@ -42,10 +43,10 @@ public class EventDTO {
     public Integer getId() {
         return id;
     }
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
-    public void setStatus(String status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 

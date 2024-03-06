@@ -45,7 +45,7 @@ class UserRestControllerV1Test {
     }
 
     @Test
-    @WithMockUser(username="admin",authorities={"ADMIN"})
+    @WithMockUser(authorities={"ADMIN"})
     void getUserByIdTestAdminReturn200() {
         Integer userId = 1;
 
@@ -73,7 +73,7 @@ class UserRestControllerV1Test {
     }
 
     @Test
-    @WithMockUser(username="MODERATOR",authorities={"MODERATOR"})
+    @WithMockUser(authorities={"MODERATOR"})
     void getUserByIdTestModeratorReturn200() {
         Integer userId = 1;
 
@@ -124,7 +124,7 @@ class UserRestControllerV1Test {
     }
 
     @Test
-    @WithMockUser(username="admin",authorities={"ADMIN"})
+    @WithMockUser(authorities={"ADMIN"})
     void getAllUsersTestAdminReturn200() {
         UserEntity userEntity = new UserEntity();
         userEntity.setName("testUser");
@@ -162,7 +162,7 @@ class UserRestControllerV1Test {
     }
 
     @Test
-    @WithMockUser(username="MODERATOR",authorities={"MODERATOR"})
+    @WithMockUser(authorities={"MODERATOR"})
     void getAllUsersTestModeratorReturn200() {
         UserEntity userEntity = new UserEntity();
         userEntity.setName("testUser");
@@ -263,7 +263,6 @@ class UserRestControllerV1Test {
                     assertEquals(outPutUser.getStatus(), expectedUser.getStatus());
                 });
     }
-
 
     @Test
     @WithMockUser(authorities = "USER")

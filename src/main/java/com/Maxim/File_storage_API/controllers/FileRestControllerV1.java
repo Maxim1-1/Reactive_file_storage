@@ -32,9 +32,15 @@ public class FileRestControllerV1 {
 
     @GetMapping("/{fileId}")
     public Mono<FileDTO> getFileById(@PathVariable Integer fileId, Authentication authentication) {
-        CustomPrincipal userDetails = (CustomPrincipal) authentication.getPrincipal();
+        CustomPrincipal userDetails = null;
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof CustomPrincipal) {
+             userDetails = (CustomPrincipal) principal;
+//        CustomPrincipal userDetails = (CustomPrincipal) authentication.getPrincipal();
+           
+        }
         Integer userId = userDetails.getId();
-        return fileUserService.getFileByIdForRole(authentication.getAuthorities(),userId,fileId).map(fileMapper::map);
+        return fileUserService.getFileByIdForRole(authentication.getAuthorities(), userId, fileId).map(fileMapper::map);
     }
 
     @GetMapping("")

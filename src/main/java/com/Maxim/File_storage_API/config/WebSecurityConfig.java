@@ -41,12 +41,13 @@ public class WebSecurityConfig {
                                 .pathMatchers(HttpMethod.PUT, "/api/v1/events/*").hasAnyAuthority("MODERATOR","ADMIN")
                                 .pathMatchers(HttpMethod.DELETE, "/api/v1/events/*").hasAnyAuthority("MODERATOR","ADMIN")
 
-                                .pathMatchers(HttpMethod.GET, "/api/v1/files/*").hasAnyAuthority("MODERATOR","ADMIN")
-                                .pathMatchers(HttpMethod.GET, "/api/v1/files").hasAnyAuthority("MODERATOR","ADMIN")
+                                .pathMatchers(HttpMethod.GET, "/api/v1/files/*").hasAnyAuthority("MODERATOR","ADMIN","USER")
+                                .pathMatchers(HttpMethod.GET, "/api/v1/files").hasAnyAuthority("MODERATOR","ADMIN","USER")
                                 .pathMatchers(HttpMethod.POST, "/api/v1/files").hasAnyAuthority("MODERATOR","ADMIN")
                                 .pathMatchers(HttpMethod.PUT, "/api/v1/files/*").hasAnyAuthority("MODERATOR","ADMIN")
                                 .pathMatchers(HttpMethod.DELETE, "/api/v1/files/*").hasAnyAuthority("MODERATOR","ADMIN")
 
+                                .pathMatchers(HttpMethod.GET, "/api/v1/files/history").permitAll()
                                 .pathMatchers("/api/v1/auth/register", "/api/v1/auth/login").permitAll()
                                 .pathMatchers("/api/**").hasAnyAuthority("ADMIN")
                 )
