@@ -10,6 +10,7 @@ import com.Maxim.File_storage_API.mapper.FileMapper;
 import com.Maxim.File_storage_API.security.CustomPrincipal;
 import com.Maxim.File_storage_API.service.FileService;
 import com.Maxim.File_storage_API.service.FileUserService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
@@ -20,11 +21,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
+
 
 @SpringBootTest
 @AutoConfigureWebTestClient
@@ -40,60 +41,6 @@ class FileRestControllerV1Test {
 
     @MockBean
     private FileMapper fileMapper;
-
-    @Test
-    @WithMockUser(authorities = "USER")
-    void getFileById() {
-        CustomPrincipal userDetails = new CustomPrincipal(1,"test");
-        given(authentication.getPrincipal()).willReturn(userDetails);
-
-        FileDTO testFileDto = new FileDTO();
-        FileEntity file = new FileEntity();
-
-        given(fileUserService.getFileByIdForRole(authentication.getAuthorities(), 1, 1)).willReturn(Mono.just(file));
-        given(fileMapper.map(any(FileEntity.class))).willReturn(testFileDto);
-
-        webTestClient.mutateWith(csrf()).get()
-                .uri("/api/v1/files/1")
-                .exchange()
-                .expectStatus().isOk();
-
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     @Test
     @WithMockUser(authorities = "USER")

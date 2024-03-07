@@ -25,20 +25,14 @@ public class FileRestControllerV1 {
 
     private FileMapper fileMapper;
 
-    private  FileService fileService;
+    private FileService fileService;
 
-    private  FileUserService fileUserService;
+    private FileUserService fileUserService;
 
 
     @GetMapping("/{fileId}")
     public Mono<FileDTO> getFileById(@PathVariable Integer fileId, Authentication authentication) {
-        CustomPrincipal userDetails = null;
-        Object principal = authentication.getPrincipal();
-        if (principal instanceof CustomPrincipal) {
-             userDetails = (CustomPrincipal) principal;
-//        CustomPrincipal userDetails = (CustomPrincipal) authentication.getPrincipal();
-           
-        }
+        CustomPrincipal userDetails = (CustomPrincipal) authentication.getPrincipal();
         Integer userId = userDetails.getId();
         return fileUserService.getFileByIdForRole(authentication.getAuthorities(), userId, fileId).map(fileMapper::map);
     }
@@ -47,7 +41,7 @@ public class FileRestControllerV1 {
     public Flux<FileDTO> getAllFiles(Authentication authentication) {
         CustomPrincipal userDetails = (CustomPrincipal) authentication.getPrincipal();
         Integer userId = userDetails.getId();
-        return fileUserService.getAllFilesForRole(authentication.getAuthorities(),userId).map(fileMapper::map);
+        return fileUserService.getAllFilesForRole(authentication.getAuthorities(), userId).map(fileMapper::map);
     }
 
 
@@ -55,12 +49,12 @@ public class FileRestControllerV1 {
     public Mono<FileDTO> saveFile(@RequestPart("file") Mono<FilePart> file, Authentication authentication) {
         CustomPrincipal userDetails = (CustomPrincipal) authentication.getPrincipal();
         Integer userId = userDetails.getId();
-        return fileUserService.saveFile(file,userId).map(fileMapper::map);
+        return fileUserService.saveFile(file, userId).map(fileMapper::map);
     }
 
 
     @PutMapping("/{id}")
-    public Mono<FileDTO> updateFileById(@PathVariable Integer id,@RequestBody FileDTO fileDTO) {
+    public Mono<FileDTO> updateFileById(@PathVariable Integer id, @RequestBody FileDTO fileDTO) {
         FileEntity file = fileMapper.map(fileDTO);
         return fileService.updateFileById(file, id).map(fileMapper::map);
     }
@@ -74,7 +68,7 @@ public class FileRestControllerV1 {
     public Flux<HistoryDTO> getHistory(Authentication authentication) {
         CustomPrincipal userDetails = (CustomPrincipal) authentication.getPrincipal();
         Integer userId = userDetails.getId();
-        return fileUserService.getHistory(authentication.getAuthorities(),userId);
+        return fileUserService.getHistory(authentication.getAuthorities(), userId);
     }
 
 }
