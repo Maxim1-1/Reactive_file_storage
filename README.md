@@ -23,7 +23,7 @@
 3. Выполните команду `docker-compose up` для запуска приложения
       
 #### Стек технологий: 
-* Spring WebFlux,Security,Boot
+* Spring (WebFlux,Security,Boot)
 * R2DBC
 * Amazon S3
 * Flyway
