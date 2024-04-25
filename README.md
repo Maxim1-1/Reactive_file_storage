@@ -1,9 +1,31 @@
-Данный проект предоставляет API для удаленного хранения файлов пользователей, с возможностью получения истории загрузки.   
+Данный приложение предоставляет API для удаленного хранения файлов пользователей(аналогично Google drive), с возможностью получения истории загрузки.   
 
-**В проекте предоставлены три уровня доступа:**   
+#### В проекте предоставлены три уровня доступа:  
 - USER - имеет доступ только к своим файлам  
 - ADMIN - имеет полный доступ к приложению   
 - MODERATOR - имеет полный доступ к приложению, за исключением функции удалением USER  
 
-**Для запуска приложения используется Docker**   
-Стек технологий: Spring WebFlux,Security, Boot, R2DBC, S3, Flyway, MySQL  
+#### Запуска приложения локально
+1. Проверьте, что Docker установлен на вашем устройстве
+2. Заполните следующие параметры в файле **docker-compose.yaml**:
+   
+      - R2DBC_URL=r2dbc:mysql://mysql_db/**{your_db_name}**
+      - R2DBC_USER=**{your_db_user}**
+      - R2DBC_PASSWORD=**{your_db_password}**
+      - DB_URL=jdbc:mysql://mysql_db:3306/**{your_db_name}**
+      - DB_USER=**{your_db_user}**
+      - DB_PASSWORD=**{your_db_password}**
+      - S3_ACCESS_KEY=**ACCESS KEY FOR S3**
+      - S3_SECRET_KEY=**SECRET KEY FOR S3**
+      - S3_REGION=**YOUR_REGION**
+      - S3_URL=**YOUR_URL**
+      - S3_BUCKET=**YOUR BUCKET NAME**
+
+      
+#### Стек технологий: 
+* Spring WebFlux
+* Security, Boot
+* R2DBC
+* Amazon S3
+* Flyway
+* MySQL  
